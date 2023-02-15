@@ -5,9 +5,5 @@
 `docker build --tag ra-img .`
 
 
-docker run -d \
-  --name ra-container \
-  --mount source="${PWD}",target=/app,type=bind \
-  --publish 8000:8000 \
-ra-img
+`docker run -d --name ra-container --mount source="${PWD}",target=/app,type=bind --publish 8000:8000 ra-img`
 
