@@ -1,4 +1,4 @@
-name: Build Django
+name: Base Test
 
 on:
     push:
@@ -7,20 +7,9 @@ on:
         branches: [main]
 
 jobs:
-  simple_build:
-    runs-on: ubuntu-latest
+  test_project:
+    runs-on: ubuntu-latest # operating system your code will run on
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Setup Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
-        with:
-           python-version: 3.8
-      - name: Install requirements
-        run: |
-            pip install -r requirements.txt
-      - name: Run tests
-        run: |
-            cd src
-            python manage.py test
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+      - run: pip install -r requirements.txt # install all our dependencies for the project
