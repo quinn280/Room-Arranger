@@ -1,0 +1,34 @@
+body {
+ 	padding: 40px;
+ }
+h2, h2 {
+ 	text-align: center;
+ }
+ 
+table {
+	 margin: auto;
+	 border: 1px solid black;
+	 background-color: tan;
+ }
+ 
+td {
+	 background: tan;
+	 width: 60px;
+	 height: 60px;
+	 border: 1px solid black;
+	 font-size: 60px;
+	 text-align: center;
+	 font-family: monospace;
+ }
+th {
+ 
+ 	text-align: right;
+ }
+ 
+tr:nth-child(odd)>td:nth-child(odd) {
+	background: chocolate;
+}
+
+tr:nth-child(even)>td:nth-child(even) {
+	background: chocolate;
+}
