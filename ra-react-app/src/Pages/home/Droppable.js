@@ -1,6 +1,5 @@
 import React from "react";
 import { useDroppable } from "@dnd-kit/core";
-import "./styles.scss";
 
 const CustomStyle = {
   display: "flex",

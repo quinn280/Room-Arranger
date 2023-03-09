@@ -1,11 +1,3 @@
-.room {
-    position: fixed;
-  top: 50%;
-  left: 50%;
-  /* bring your own prefixes */
-  transform: translate(-50%, -50%);
-}
-
 $color-primary: #f857a8;
 $color-secondary: #ff5858;
 $color-neutral-lt: #fff;
@@ -63,21 +55,7 @@ section {
   height: 100vh;
 }
 
-#home {
-  background-color: #ddd;
-}
 
-#about {
-  background-color: #aaa;
-}
-
-#work {
-  background-color: #888;
-}
-
-#contact {
-  background-color: #666;
-}
 
 /*-------------Helpers-------------*/
 .skew {
@@ -93,7 +71,6 @@ section {
   overflow: hidden;
   width: 100%;
   margin: 0 auto;
-  position: fixed;
   top: 0;
   left: 0;
   z-index: 100;

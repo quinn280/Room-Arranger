@@ -1,6 +1,5 @@
 import React from "react";
 import { useDraggable } from "@dnd-kit/core";
-import "./styles.scss";
 
 const CustomStyle = {
 
