@@ -1,9 +1,13 @@
 # Room-Arranger
 
-[![Base Test](https://github.com/ChicoState/Room-Arranger/actions/workflows/actions.yaml/badge.svg)](https://github.com/ChicoState/Room-Arranger/actions/workflows/actions.yaml)
+Docker Commands (in ra-react-app directory)
 
-`docker build --tag ra-img .`
+```
+## Re-build after you install new packages or merge other team member's commits (they may have installed packages)
+docker run -it --rm -v ${PWD}:/app -v /app/node_modules -p 3000:3000 -e CHOKIDAR_USEPOLLING=true ra-img
+```
 
-
-`docker run -d --name ra-container --mount source="${PWD}",target=/app,type=bind --publish 8000:8000 ra-img`
-
+```
+## Run when you start development
+docker run -it --rm -v ${PWD}:/app -v /app/node_modules -p 3000:3000 -e CHOKIDAR_USEPOLLING=true ra-img
+```
