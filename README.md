@@ -16,11 +16,11 @@ docker run -it --rm -v ${PWD}:/app -v /app/node_modules -p 3000:3000 -e CHOKIDAR
 
 ![Room Example](room_example.png "Room Example")
 
-dimensions: [Width, Height]
-coordinates: [TopLeft-X, TopLeft-Y]
-Heading: How much the object is rotated clockwise in degrees. Range 0-360. 
+dimensions: [Width, Height]    
+coordinates: [TopLeft-X, TopLeft-Y]     
+Heading: How much the object is rotated clockwise in degrees. Range 0-360.     
 
-Important: Width, Height, TopLeft-X, and TopLeft-Y all refer to the object when it is not rotated (heading 0).
+Important: Width, Height, TopLeft-X, and TopLeft-Y all refer to the object when it is not rotated (heading 0).   
 
 The dimensions and coordinates do not refer to how they would be perceived by the user after an object is rotated. 
 For example, in the room below, the original top-left corner of the bed is now physically on the bottom left because 
