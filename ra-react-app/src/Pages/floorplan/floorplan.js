@@ -3,7 +3,7 @@ import React from "react";
 const FloorPlan = () => {
     return (
         <div>
-            <p>Floor Plan Design</p>
+            <p>Floor Plan</p>
         </div>
     )
 }
