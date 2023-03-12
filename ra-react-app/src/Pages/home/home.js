@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Moveable from "react-moveable";
+import Moveable, { MoveableManagerInterface, Renderer } from "react-moveable";
 import Selecto from "react-selecto";
 import { flushSync } from "react-dom";
 import bed from '../../Assets/vectors/furniture/bed.svg';
@@ -83,11 +83,19 @@ const furnitureList = [
 
 ];
 
+
+
 const Home = () => {
   const [furniture, setFurniture] = useState(furnitureList);
   const [targets, setTargets] = useState([]);
   const moveableRef = React.useRef(null);
   const selectoRef = React.useRef(null);
+
+  const handleRemove = (id) => {
+    const _furniture = furniture.filter(f => f.id !== id);
+
+    setFurniture(_furniture);
+  }
 
 
   return (
@@ -109,6 +117,10 @@ const Home = () => {
       <Moveable
         flushSync={flushSync}
         ref={moveableRef}
+        props={{
+          dimensionViewable: true,
+        }}
+        ables={[DimensionViewable]}
         target={targets}
         individualGroupable={true}
         draggable={true}
@@ -117,7 +129,7 @@ const Home = () => {
         edgeDraggable={false}
         startDragRotate={0}
         throttleDragRotate={0}
-        scalable={true}
+        resizable={true}
         keepRatio={false}
         throttleScale={0}
         renderDirections={["nw", "n", "ne", "w", "e", "sw", "s", "se"]}
@@ -133,6 +145,11 @@ const Home = () => {
         onRotate={e => {
           e.target.style.transform = e.drag.transform;
         }}
+        onResize={e => {
+                         e.target.style.width = `${e.width}px`;
+                       e.target.style.height = `${e.height}px`;
+                          e.target.style.transform = e.drag.transform;
+                    }}
 
       />
       <Selecto
@@ -171,4 +188,41 @@ const Home = () => {
   );
 };
 
+const DimensionViewable = {
+  name: "dimensionViewable",
+  props: {},
+  events: {},
+  render(moveable, React) {
+    const rect = moveable.getRect();
+
+    // Add key (required)
+    // Add class prefix moveable-(required)
+    return <div key={"dimension-viewer"} className={"moveable-dimension"} style={{
+      position: "absolute",
+      left: `${rect.width / 2}px`,
+      top: `${rect.height + 20}px`,
+      background: "#4af",
+      borderRadius: "2px",
+      padding: "2px 4px",
+      color: "white",
+      fontSize: "13px",
+      whiteSpace: "nowrap",
+      fontWeight: "bold",
+      willChange: "transform",
+      transform: `translate(-50%, 0px)`,
+    }}>
+      {Math.round(rect.offsetWidth)} x {Math.round(rect.offsetHeight)}
+    </div>;
+  },
+};
+
+
+
 export default Home;
+
+
+
+
+
+
+
