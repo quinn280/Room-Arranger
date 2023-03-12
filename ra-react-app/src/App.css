@@ -1,0 +1,24 @@
+html,
+body,
+#root {
+    height: 100%;
+    margin: 0;
+    background-color: #f2f3f5;
+}
+
+.App {
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+}
+
+.App .AppNavBar {
+    flex: 0 1 auto;
+}
+
+.App .AppRouting {
+    display: flex;
+    flex-flow: column;
+    flex: 1 1 auto;
+    overflow-y: auto;
+}

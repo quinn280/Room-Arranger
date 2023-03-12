@@ -18,9 +18,9 @@ const Routing = () => (
 );
 
 const App = () => (
-  <div>
-    <NavBar/>
-    <Routing/>
+  <div className="App">
+    <NavBar className="AppNavBar"/>
+    <Routing className="AppRouting"/>
   </div>
 );
 
