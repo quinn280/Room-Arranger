@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Moveable, { MoveableManagerInterface, Renderer } from "react-moveable";
+import Moveable from "react-moveable";
 import Selecto from "react-selecto";
 import { flushSync } from "react-dom";
 import bed from '../../Assets/vectors/furniture/bed.svg';
@@ -91,18 +91,34 @@ const Home = () => {
   const moveableRef = React.useRef(null);
   const selectoRef = React.useRef(null);
 
-  const handleRemove = (id) => {
-    const _furniture = furniture.filter(f => f.id !== id);
+  const handleRemove = (key) => {
+    setFurniture(furniture.filter((f) => f.key != key));
+    setTargets([]);
+  };
 
-    setFurniture(_furniture);
-  }
+  const onKeyPressed = (e) => {
+    const keyCode = e.keyCode;
+    const dataKey = e.target.getAttribute("data-key");
 
+    console.log(`Backspace pressed on item with data-key ${dataKey}`);
+
+    if (keyCode === 8 || keyCode === 46) {
+      handleRemove(dataKey);
+    }
+  };
 
   return (
     <div className="homepage">
       <div className="room">
         {furniture.map((a) => (
-          <img src={a.url} className="target" alt=""
+          <img 
+            src={a.url} 
+            key={a.key}
+            data-key={a.key}
+            className="target" 
+            alt=""
+            onKeyDown={onKeyPressed}
+            tabIndex="-1"
             style={{
               position: "absolute",
               left: `${a.position.x}px`,
@@ -110,7 +126,6 @@ const Home = () => {
               width: `${a.width}`,
               height: `${a.height}`,
             }}
-            key={a.key}
           />
         ))}
       </div>
@@ -136,21 +151,20 @@ const Home = () => {
         rotatable={true}
         rotationPosition={"top"}
         hideDefaultLines={false}
+        onDragStart={(e) => {
+          e.target.focus();
+        }}
         onDrag={e => {
           e.target.style.transform = e.transform;
-        }}
-        onScale={e => {
-          e.target.style.transform = e.drag.transform;
         }}
         onRotate={e => {
           e.target.style.transform = e.drag.transform;
         }}
         onResize={e => {
-                         e.target.style.width = `${e.width}px`;
-                       e.target.style.height = `${e.height}px`;
-                          e.target.style.transform = e.drag.transform;
-                    }}
-
+          e.target.style.width = `${e.width}px`;
+          e.target.style.height = `${e.height}px`;
+          e.target.style.transform = e.drag.transform;
+        }}
       />
       <Selecto
         ref={selectoRef}
