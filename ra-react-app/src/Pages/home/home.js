@@ -88,19 +88,25 @@ const furnitureList = [
 const Home = () => {
   const [furniture, setFurniture] = useState(furnitureList);
   const [targets, setTargets] = useState([]);
+  const [designMode, setDesignMode] = useState("room");
   const moveableRef = React.useRef(null);
   const selectoRef = React.useRef(null);
+  const boxRef = React.useRef(null);
 
   const handleRemove = (key) => {
+    // eslint-disable-next-line
     setFurniture(furniture.filter((f) => f.key != key));
     setTargets([]);
+  };
+
+  const handleModeChange = (e) => {
+    const checked = e.target.checked;
+    setDesignMode(checked ? "furnish" : "room");
   };
 
   const onKeyPressed = (e) => {
     const keyCode = e.keyCode;
     const dataKey = e.target.getAttribute("data-key");
-
-    console.log(`Backspace pressed on item with data-key ${dataKey}`);
 
     if (keyCode === 8 || keyCode === 46) {
       handleRemove(dataKey);
@@ -109,7 +115,15 @@ const Home = () => {
 
   return (
     <div className="homepage">
-      <div className="room">
+      <div>
+        <p className="tog">{designMode === "furnish" ? "Floor Plan" : "Furnish"}</p>
+        <label className="switch tog">
+          <input type="checkbox" onChange={handleModeChange}/>
+          <span className="slider round"></span>
+        </label>
+      </div>
+      
+      <div className="room" ref={boxRef}>
         {furniture.map((a) => (
           <img 
             src={a.url} 
@@ -136,9 +150,9 @@ const Home = () => {
           dimensionViewable: true,
         }}
         ables={[DimensionViewable]}
-        target={targets}
+        target={designMode === "furnish" ? targets : boxRef}
         individualGroupable={true}
-        draggable={true}
+        draggable={designMode === "furnish" ? true : false}
         throttleDrag={1}
         throttleRotate={5}
         edgeDraggable={false}
@@ -148,10 +162,10 @@ const Home = () => {
         keepRatio={false}
         throttleScale={0}
         renderDirections={["nw", "n", "ne", "w", "e", "sw", "s", "se"]}
-        rotatable={true}
+        rotatable={designMode === "furnish" ? true : false}
         rotationPosition={"top"}
         hideDefaultLines={false}
-        onDragStart={(e) => {
+        onDragStart={e => {
           e.target.focus();
         }}
         onDrag={e => {
