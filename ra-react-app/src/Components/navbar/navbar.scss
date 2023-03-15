@@ -44,19 +44,6 @@ html {
   scroll-behavior: smooth;
 }
 
-/*-------------Layout-------------*/
-body {
-  line-height: 1.5em;
-  padding: 0;
-  margin: 0;
-}
-
-section {
-  height: 100vh;
-}
-
-
-
 /*-------------Helpers-------------*/
 .skew {
   @include skew;
@@ -68,7 +55,6 @@ section {
 
 /*-------------Nav-------------*/
 #nav-wrapper {
-  overflow: hidden;
   width: 100%;
   margin: 0 auto;
   top: 0;
@@ -82,11 +68,9 @@ section {
   flex-direction: column;
   font-family: $headings-font;
   height: 4em;
-  overflow: hidden;
 
   &.nav-visible {
     height: 100%;
-    overflow: auto;
   }
 }
 
@@ -157,12 +141,7 @@ a:hover {
 }
 
 @media (min-width: 800px) {
-  #nav-wrapper {
-    overflow: hidden;
-  }
-
   #nav {
-    overflow: hidden;
     flex-direction: row;
   }
 
@@ -171,7 +150,6 @@ a:hover {
   }
 
   .right {
-    overflow: hidden;
     flex-direction: row;
     justify-content: flex-end;
     position: relative;
