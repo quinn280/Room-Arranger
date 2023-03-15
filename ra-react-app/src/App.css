@@ -4,12 +4,13 @@ body,
     height: 100%;
     margin: 0;
     background-color: #f2f3f5;
+    overflow-x: hidden; /* Temporary cover-up for some issue in navbar.scss*/
 }
 
 .App {
+    height: 100%;
     display: flex;
     flex-flow: column;
-    height: 100%;
 }
 
 .App .AppNavBar {
@@ -18,7 +19,5 @@ body,
 
 .App .AppRouting {
     display: flex;
-    flex-flow: column;
     flex: 1 1 auto;
-    overflow-y: auto;
 }
