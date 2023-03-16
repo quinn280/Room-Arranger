@@ -25,6 +25,8 @@ const Home = () => {
 
   const [requestCallbacksFurniture] = useState(() => {
     function request() {
+
+      
       moveableRef.current.request("draggable", {
         x: parseInt(xInputRef.current.value),
         y: parseInt(yInputRef.current.value),
@@ -39,6 +41,7 @@ const Home = () => {
         rotate: parseInt(rotateInputRef.current.value),
       }, true);
     }
+
     return {
       onInput(e) {
         const ev = (e.nativeEvent || e);
@@ -58,12 +61,15 @@ const Home = () => {
   });
 
   const [requestCallbacksRoom] = useState(() => {
+
     function request() {
       boxRef.current.request("resizable", {
         offsetWidth: parseInt(roomWidthInputRef.current.value),
         offsetHeight: parseInt(roomHeightInputRef.current.value),
       }, true);
     }
+
+
     return {
       onInput(e) {
         const ev = (e.nativeEvent || e);
@@ -112,19 +118,12 @@ const Home = () => {
     }
   };
 
-  const updateForms = (e) => {
-    if (designMode === "furnish")
-      updateFurnitureForms(e);
-    else
-      updateRoomForms(e);
-  }
-
   function round(value, precision) {
     var multiplier = Math.pow(10, precision || 0);
     return Math.round(value * multiplier) / multiplier;
-} 
+  }
 
-  const updateFurnitureForms = (e) => {
+  const updateFurnitureForm = (e) => {
     requestAnimationFrame(() => {
       const rect = e.moveable.getRect();
       xInputRef.current.value = `${round(rect.left, 1)}`;
@@ -135,7 +134,7 @@ const Home = () => {
     })
   };
 
-  const updateRoomForms = (e) => {
+  const updateRoomForm = (e) => {
     requestAnimationFrame(() => {
       const rect = e.moveable.getRect();
       roomWidthInputRef.current.value = `${round(rect.offsetWidth, 1)}`;
@@ -177,110 +176,121 @@ const Home = () => {
               }}
             />
           ))}
+          <Moveable
+            flushSync={flushSync}
+            ref={moveableRef}
+            props={{
+              dimensionViewable: true,
+            }}
+            ables={[DimensionViewable]}
+            target={(designMode === "furnish") ? targets: null}
+            individualGroupable={true}
+            draggable={true}
+            throttleDrag={1}
+            throttleRotate={5}
+            resizable={true}
+            renderDirections={["nw", "n", "ne", "w", "e", "sw", "s", "se"]}
+            rotatable={true}
+            onDragStart={e => {
+              e.target.focus();
+            }}
+            onDrag={e => {
+              e.target.style.transform = e.transform;
+            }}
+            onRotate={e => {
+              e.target.style.transform = e.drag.transform;
+            }}
+            onResize={e => {
+              e.target.style.width = `${e.width}px`;
+              e.target.style.height = `${e.height}px`;
+              e.target.style.transform = e.drag.transform;
+            }}
+            onDragEnd={e => {
+              updateFurnitureForm(e);
+            }}
+            onRotateEnd={e => {
+              updateFurnitureForm(e);
+            }}
+            onResizeEnd={e => {
+              updateFurnitureForm(e);
+            }}
+          ></Moveable>
+          <Selecto
+            ref={selectoRef}
+            selectableTargets={[".target"]}
+            dragContainer={".room"}
+            hitRate={0}
+            selectByClick={true}
+            selectFromInside={false}
+            ratio={0}
+            onDragStart={e => {
+              const moveable = moveableRef.current;
+              const target = e.inputEvent.target;
+              if (
+                moveable.isMoveableElement(target)
+                || targets.some(t => t === target || t.contains(target))
+              ) {
+                e.stop();
+              }
+            }}
+            onSelectEnd={e => {
+              const moveable = moveableRef.current;
+              setTargets(e.selected);
+
+              if (e.isDragStart) {
+                e.inputEvent.preventDefault();
+
+                setTimeout(() => {
+                  moveable.dragStart(e.inputEvent);
+                });
+              }
+            }}
+          ></Selecto>
         </div>
         <Moveable
           flushSync={flushSync}
-          ref={moveableRef}
           props={{
             dimensionViewable: true,
           }}
           ables={[DimensionViewable]}
-          target={designMode === "furnish" ? targets : boxRef}
-          individualGroupable={true}
-          draggable={designMode === "furnish" ? true : false}
-          throttleDrag={1}
-          throttleRotate={5}
-          edgeDraggable={false}
-          startDragRotate={0}
-          throttleDragRotate={0}
+          target={((designMode === "room") ? ".room" : ".dummyvalue")}
+          ref={boxRef}
           resizable={true}
-          keepRatio={false}
-          throttleScale={0}
-          renderDirections={["nw", "n", "ne", "w", "e", "sw", "s", "se"]}
-          rotatable={designMode === "furnish" ? true : false}
-          rotationPosition={"top"}
-          hideDefaultLines={false}
-          onDragStart={e => {
-            e.target.focus();
-          }}
-          onDrag={e => {
-            e.target.style.transform = e.transform;
-          }}
-          onRotate={e => {
-            e.target.style.transform = e.drag.transform;
-          }}
-          onResize={e => {
+          onResize={(e) => {
             e.target.style.width = `${e.width}px`;
             e.target.style.height = `${e.height}px`;
             e.target.style.transform = e.drag.transform;
           }}
-          onDragEnd={e => {
-            updateForms(e);
-          }}
-          onRotateEnd={e => {
-            updateForms(e);
-          }}
           onResizeEnd={e => {
-            updateForms(e);
+            updateRoomForm(e);
           }}
-        />
-        <Selecto
-          ref={selectoRef}
-          selectableTargets={[".target"]}
-          dragContainer={".room"}
-          hitRate={0}
-          selectByClick={true}
-          selectFromInside={false}
-          ratio={0}
-          onDragStart={e => {
-            const moveable = moveableRef.current;
-            const target = e.inputEvent.target;
-            if (
-              moveable.isMoveableElement(target)
-              || targets.some(t => t === target || t.contains(target))
-            ) {
-              e.stop();
-            }
-          }}
-          onSelectEnd={e => {
-            const moveable = moveableRef.current;
-            setTargets(e.selected);
-
-            if (e.isDragStart) {
-              e.inputEvent.preventDefault();
-
-              setTimeout(() => {
-                moveable.dragStart(e.inputEvent);
-              });
-            }
-          }}
-        ></Selecto>
+        ></Moveable>
       </div>
       <div className="right-bar">
         {
           (designMode === "furnish")
-          ?
-          <form className="furnFormEntry" key="furnFormEntry">
-            <label htmlFor="x">X:</label><br />
-            <input ref={xInputRef} {...requestCallbacksFurniture} type="number" id="x" name="x" /><br />
-            <label htmlFor="y">Y:</label><br />
-            <input ref={yInputRef} {...requestCallbacksFurniture} type="number" id="y" name="y" /><br />
-            <label htmlFor="width">Width</label><br />
-            <input ref={widthInputRef} {...requestCallbacksFurniture} type="number" id="width" name="width" /><br />
-            <label htmlFor="height">Height</label><br />
-            <input ref={heightInputRef} {...requestCallbacksFurniture} type="number" id="height" name="height" /><br />
-            <label htmlFor="rotation">Rotation:</label><br />
-            <input ref={rotateInputRef} {...requestCallbacksFurniture} type="number" id="rotation" name="rotation" /><br />
-          </form>
-          :
-          <form className="roomFormEntry" key="roomFormEntry">
-            <label htmlFor="roomWidth">Width:</label><br />
-            <input ref={roomWidthInputRef} {...requestCallbacksRoom} type="number" id="roomWidth" name="roomWidth" /><br />
-            <label htmlFor="roomHeighty">Height:</label><br />
-            <input ref={roomHeightInputRef} {...requestCallbacksRoom} type="number" id="roomHeight" name="roomHeight" /><br />
-          </form>
+            ?
+            <form className="furnFormEntry" key="furnFormEntry">
+              <label htmlFor="x">X:</label><br />
+              <input ref={xInputRef} {...requestCallbacksFurniture} type="number" id="x" name="x" /><br />
+              <label htmlFor="y">Y:</label><br />
+              <input ref={yInputRef} {...requestCallbacksFurniture} type="number" id="y" name="y" /><br />
+              <label htmlFor="width">Width</label><br />
+              <input ref={widthInputRef} {...requestCallbacksFurniture} type="number" id="width" name="width" /><br />
+              <label htmlFor="height">Height</label><br />
+              <input ref={heightInputRef} {...requestCallbacksFurniture} type="number" id="height" name="height" /><br />
+              <label htmlFor="rotation">Rotation:</label><br />
+              <input ref={rotateInputRef} {...requestCallbacksFurniture} type="number" id="rotation" name="rotation" /><br />
+            </form>
+            :
+            <form className="roomFormEntry" key="roomFormEntry">
+              <label htmlFor="roomWidth">Width:</label><br />
+              <input ref={roomWidthInputRef} {...requestCallbacksRoom} type="number" id="roomWidth" name="roomWidth" /><br />
+              <label htmlFor="roomHeight">Height:</label><br />
+              <input ref={roomHeightInputRef} {...requestCallbacksRoom} type="number" id="roomHeight" name="roomHeight" /><br />
+            </form>
         }
-        
+
         <div>
           <p className="tog">{designMode === "furnish" ? "Floor Plan" : "Furnish"}</p>
           <label className="switch tog">
