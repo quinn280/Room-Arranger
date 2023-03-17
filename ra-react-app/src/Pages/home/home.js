@@ -4,12 +4,19 @@ import Selecto from "react-selecto";
 import { flushSync } from "react-dom";
 import './home.css';
 import furnitureList from "./furnitureData.js";
+import structureList from "./structureData.js"
 
 
 const Home = () => {
-  const [activeFurniture, setActiveFurniture] = useState([]);
-  const [targets, setTargets] = useState([]);
+  const [activeObjects, setActiveObjects] = useState([]);
+  const [strucTargets, setStrucTargets] = useState([]);
+  const [furnTargets, setFurnTargets] = useState([]);
   const [designMode, setDesignMode] = useState("room");
+  const [roomLock, setRoomLock] = useState(false);
+  const [maxZ, setMaxZ] = useState(1);
+  const [minZ, setMinZ] = useState(0);
+  
+
   const moveableRef = React.useRef(null);
   const selectoRef = React.useRef(null);
   const boxRef = React.useRef(null);
@@ -26,7 +33,7 @@ const Home = () => {
   const [requestCallbacksFurniture] = useState(() => {
     function request() {
 
-      
+
       moveableRef.current.request("draggable", {
         x: parseInt(xInputRef.current.value),
         y: parseInt(yInputRef.current.value),
@@ -88,20 +95,51 @@ const Home = () => {
     };
   });
 
+
   const handleRemove = (uid) => {
-    setActiveFurniture(activeFurniture.filter((f) => f.uid !== uid));
-    setTargets([]);
+    const foundItem = activeObjects.find(f => f.uid === uid);
+    if (designMode === "furnish" && foundItem.type === "structural")
+      return;
+
+    if (designMode === "room" && foundItem.type === "furniture")
+      return;
+
+    setActiveObjects(activeObjects.filter((f) => f.uid !== uid));
+    if (designMode === "room")
+      setStrucTargets([]);
+    else
+      setFurnTargets([]);
   };
 
   const handleAdd = (itemKey) => {
-    const foundItem = furnitureList.find(f => parseInt(f.itemKey) === parseInt(itemKey));
-    const foundItemCopy = Object.assign({}, foundItem);
-    foundItemCopy.uid = generateUID();
-    setActiveFurniture(oldArray => [...oldArray, foundItemCopy]);
+    const activeList = (designMode === "room" ? structureList : furnitureList);
+    const foundItem = activeList.find(f => parseInt(f.itemKey) === parseInt(itemKey));
+    const newActvObj = Object.assign({}, foundItem);
+    newActvObj.uid = generateUID();
+    newActvObj.z = maxZ + 1;
+    newActvObj.width = newActvObj.defaultWidth;
+    newActvObj.height = newActvObj.defaultHeight;
+
+    const roomWidth = document.getElementById("room").style.width;
+    const roomHeight = document.getElementById("room").style.height;
+    var newObjX = parseInt((parseInt(roomWidth, 10) / 2) - (parseInt(newActvObj.width, 10) / 2), 10);
+    var newObjY = parseInt((parseInt(roomHeight, 10) / 2) - (parseInt(newActvObj.height, 10) / 2), 10);
+
+    newActvObj.rotate = "0deg";
+    newActvObj.x = `${newObjX}px`;
+    newActvObj.y = `${newObjY}px`;
+
+    setMaxZ(prevZ => prevZ + 1);
+    setActiveObjects(oldArray => [...oldArray, newActvObj]);
   }
 
   const generateUID = () => {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
+  }
+
+  const clearFurniture = () => {
+    setActiveObjects(activeObjects.filter((f) => f.type !== "furniture"));
+    setFurnTargets([]);
   }
 
   const handleModeChange = (e) => {
@@ -142,55 +180,162 @@ const Home = () => {
     })
   };
 
+
+
+  const parseTransform = (transformText) => {
+    const rotateRE = new RegExp('rotate\\((.*)\\)');
+    const xRE = new RegExp('translate\\((.*),');
+    const yRE = new RegExp('translate\\(.*, (.*?)\\)');
+
+    const rotate = (transformText.match(rotateRE)) ? transformText.match(rotateRE)[1] : "0deg";
+    const x = (transformText.match(xRE)) ? transformText.match(xRE)[1] : "0px";
+    const y = (transformText.match(yRE)) ? transformText.match(yRE)[1] : "0px";
+
+    return { rotate: rotate, x: x, y: y };
+  }
+
+  const exportData = () => {
+    const _activeObjects = activeObjects.map(a => a);
+    const child = document.getElementById("room").childNodes;
+    child.forEach((c) => {
+      if (c.classList.contains("furn-target") || c.classList.contains("struc-target")) {
+
+        const uid = c.getAttribute("data-key");
+        const w = c.style.width;
+        const h = c.style.height;
+        const t = parseTransform(c.style.transform);
+
+        const foundItem = _activeObjects.find(f => f.uid === uid);
+        foundItem.width = w;
+        foundItem.height = h;
+        foundItem.x = t.x;
+        foundItem.y = t.y;
+        foundItem.rotate = t.rotate;
+      }
+    })
+
+   
+    const roomWidth = document.getElementById("room").style.width;
+    const roomHeight = document.getElementById("room").style.height;
+    
+
+    const jsonStr = {};
+    jsonStr.room = {width: roomWidth, height: roomHeight};
+    jsonStr.activeObjects = _activeObjects;
+
+    console.log(JSON.stringify(jsonStr, undefined, 4));
+  }
+
+
+  const bringFront = () => {
+    // return if no item currently selected
+    if (!moveableRef.current.refTargets || moveableRef.current.refTargets.length < 1)
+      return;
+       
+    const uid = moveableRef.current.refTargets[0].getAttribute("data-key");
+    const _activeObjects = [...activeObjects]
+    const foundItem = _activeObjects.find(f => f.uid === uid);
+    if (foundItem.z === maxZ)
+      return;
+
+    foundItem.z = maxZ + 1;
+    setMaxZ((prevMax) => prevMax + 1);
+    setActiveObjects(_activeObjects);   
+  }
+
+  const sendBack = () => {
+    if (!moveableRef.current.refTargets || moveableRef.current.refTargets.length < 1)
+      return;
+       
+    const uid = moveableRef.current.refTargets[0].getAttribute("data-key");
+    const _activeObjects = [...activeObjects]
+    const foundItem = _activeObjects.find(f => f.uid === uid);
+    if (foundItem.z === minZ)
+      return;
+
+    foundItem.z = minZ - 1;
+    setMinZ((prevMin) => prevMin - 1);
+    setActiveObjects(_activeObjects);  
+  }
+
+
   return (
     <div className="home-page">
       <div className="left-bar">
         <div className="card-container">
-          {(designMode === "room") ? null : furnitureList.map((f) => (
-            <div className="card" key={f.itemKey} data-key={f.itemKey} onClick={() => handleAdd(f.itemKey)}>
-              <div className="image-container">
-                <img src={f.url} alt={f.description} />
-              </div>
-              <div className="description">{f.description}</div>
-            </div>
-          ))}
+          {
+            (designMode === "room")
+              ?
+              structureList.map((f) => (
+                <div className="card structure" key={f.itemKey} data-key={f.itemKey} onClick={() => handleAdd(f.itemKey)}>
+                  <div className="image-container">
+                    <img src={f.url} alt={f.description} draggable="false" />
+                  </div>
+                  <div className="description">{f.description}</div>
+                </div>
+              ))
+              :
+              furnitureList.map((f) => (
+                <div className="card furniture" key={f.itemKey} data-key={f.itemKey} onClick={() => handleAdd(f.itemKey)}>
+                  <div className="image-container">
+                    <img src={f.url} alt={f.description} draggable="false" />
+                  </div>
+                  <div className="description">{f.description}</div>
+                </div>
+              ))
+          }
         </div>
       </div>
       <div className="design-area">
-        <div className="room" ref={boxRef}>
-          {activeFurniture.map((f) => (
+        <div className="room" ref={boxRef} id="room" style = {{width: "400px", height: "400px"}}>
+          {activeObjects.map((f) => (
             <img
+              draggable="false"
               src={f.url}
               key={f.uid}
               data-key={f.uid}
-              className="target"
-              alt=""
+              className={`${f.type === "furniture" ? "furn-target" : "struc-target"} ${f.category}`}
+              alt={f.description}
               onKeyDown={onKeyPressed}
               tabIndex="-1"
               style={{
+                draggable: false,
                 position: "absolute",
-                left: `${0}px`,
-                top: `${0}px`,
-                width: `${f.defaultWidth}`,
-                height: `${f.defaultHeight}`,
+                zIndex: `${f.z}`,
+                width: `${f.width}`,
+                height: `${f.height}`,
+                transform: `translate(${f.x}, ${f.y}) rotate(${f.rotate})`
               }}
             />
           ))}
           <Moveable
+            individualGroupable={true}
+            individualGroupableProps={element => {
+              if (element.classList.contains("window")) {
+                return {
+                  resizable: false
+                };
+              }
+            }}
             flushSync={flushSync}
             ref={moveableRef}
             props={{
               dimensionViewable: true,
             }}
             ables={[DimensionViewable]}
-            target={(designMode === "furnish") ? targets: null}
-            individualGroupable={true}
+            target={(designMode === "furnish") ? furnTargets : strucTargets}
+
             draggable={true}
             throttleDrag={1}
             throttleRotate={5}
             resizable={true}
             renderDirections={["nw", "n", "ne", "w", "e", "sw", "s", "se"]}
             rotatable={true}
+
+            snappable={true}
+            elementGuidelines={[".room"]}
+            snapThreshold={6}
+
             onDragStart={e => {
               e.target.focus();
             }}
@@ -217,7 +362,7 @@ const Home = () => {
           ></Moveable>
           <Selecto
             ref={selectoRef}
-            selectableTargets={[".target"]}
+            selectableTargets={(designMode === "furnish") ? [".furn-target"] : [".struc-target"]}
             dragContainer={".room"}
             hitRate={0}
             selectByClick={true}
@@ -226,16 +371,17 @@ const Home = () => {
             onDragStart={e => {
               const moveable = moveableRef.current;
               const target = e.inputEvent.target;
-              if (
-                moveable.isMoveableElement(target)
-                || targets.some(t => t === target || t.contains(target))
-              ) {
+              const activeTargets = (designMode === "furnish") ? furnTargets : strucTargets;
+              if (moveable.isMoveableElement(target) || activeTargets.some(t => t === target || t.contains(target))) {
                 e.stop();
               }
             }}
             onSelectEnd={e => {
               const moveable = moveableRef.current;
-              setTargets(e.selected);
+              if (designMode === "furnish")
+                setFurnTargets(e.selected);
+              else
+                setStrucTargets(e.selected);
 
               if (e.isDragStart) {
                 e.inputEvent.preventDefault();
@@ -253,7 +399,7 @@ const Home = () => {
             dimensionViewable: true,
           }}
           ables={[DimensionViewable]}
-          target={((designMode === "room") ? ".room" : ".dummyvalue")}
+          target={(((designMode === "room") && !(roomLock)) ? ".room" : ".dummyvalue")}
           ref={boxRef}
           resizable={true}
           onResize={(e) => {
@@ -270,7 +416,47 @@ const Home = () => {
         {
           (designMode === "furnish")
             ?
-            <form className="furnFormEntry" key="furnFormEntry">
+            <div>
+              <form className="furnFormEntry" key="furnFormEntry">
+                <br />
+                <div>Object Dimensions</div>
+                <br />
+                <label htmlFor="x">X:</label><br />
+                <input ref={xInputRef} {...requestCallbacksFurniture} type="number" id="x" name="x" /><br />
+                <label htmlFor="y">Y:</label><br />
+                <input ref={yInputRef} {...requestCallbacksFurniture} type="number" id="y" name="y" /><br />
+                <label htmlFor="width">Width</label><br />
+                <input ref={widthInputRef} {...requestCallbacksFurniture} type="number" id="width" name="width" /><br />
+                <label htmlFor="height">Height</label><br />
+                <input ref={heightInputRef} {...requestCallbacksFurniture} type="number" id="height" name="height" /><br />
+                <label htmlFor="rotation">Rotation:</label><br />
+                <input ref={rotateInputRef} {...requestCallbacksFurniture} type="number" id="rotation" name="rotation" /><br />
+              </form>
+              <br /><br />
+              <button onClick={clearFurniture}>Clear</button>
+              <br /><br />
+              <button onClick={bringFront}>Bring Front</button>
+              <button onClick={sendBack}>Send Back</button>
+              <br /><br />
+              <button onClick={exportData}>Dev: Send Furn Data to Back End</button>
+            </div>
+            :
+            <form className="roomFormEntry" key="roomFormEntry">
+              <br />
+              <div>Room Dimensions</div>
+              <label htmlFor="roomWidth">Lock:</label>
+              <input type="checkbox" checked={roomLock} onChange={(e) => setRoomLock(e.target.checked)} />
+              <br />
+              <br />
+              <label htmlFor="roomWidth">Width:</label><br />
+              <input readOnly={roomLock} ref={roomWidthInputRef} {...requestCallbacksRoom} type="number" id="roomWidth" name="roomWidth" /><br />
+              <label htmlFor="roomHeight">Height:</label><br />
+              <input readOnly={roomLock} ref={roomHeightInputRef} {...requestCallbacksRoom} type="number" id="roomHeight" name="roomHeight" /><br />
+              <br />
+
+              <div>Object Dimensions</div>
+              <br />
+
               <label htmlFor="x">X:</label><br />
               <input ref={xInputRef} {...requestCallbacksFurniture} type="number" id="x" name="x" /><br />
               <label htmlFor="y">Y:</label><br />
@@ -281,21 +467,15 @@ const Home = () => {
               <input ref={heightInputRef} {...requestCallbacksFurniture} type="number" id="height" name="height" /><br />
               <label htmlFor="rotation">Rotation:</label><br />
               <input ref={rotateInputRef} {...requestCallbacksFurniture} type="number" id="rotation" name="rotation" /><br />
-            </form>
-            :
-            <form className="roomFormEntry" key="roomFormEntry">
-              <label htmlFor="roomWidth">Width:</label><br />
-              <input ref={roomWidthInputRef} {...requestCallbacksRoom} type="number" id="roomWidth" name="roomWidth" /><br />
-              <label htmlFor="roomHeight">Height:</label><br />
-              <input ref={roomHeightInputRef} {...requestCallbacksRoom} type="number" id="roomHeight" name="roomHeight" /><br />
+              <br /><br />
+
             </form>
         }
-
         <div>
           <p className="tog">{designMode === "furnish" ? "Floor Plan" : "Furnish"}</p>
           <label className="switch tog">
-            <input type="checkbox" onChange={handleModeChange} />
-            <span className="slider round"></span>
+            <input type="checkbox" checked={(designMode === "furnish")} onChange={handleModeChange} />
+            <span className="slider"></span>
           </label>
         </div>
       </div>
@@ -311,8 +491,6 @@ const DimensionViewable = {
   render(moveable, React) {
     const rect = moveable.getRect();
 
-    // Add key (required)
-    // Add class prefix moveable-(required)
     return <div key={"dimension-viewer"} className={"moveable-dimension"} style={{
       position: "absolute",
       left: `${rect.width / 2}px`,
