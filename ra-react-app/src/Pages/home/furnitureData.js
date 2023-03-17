@@ -6,6 +6,7 @@ const furnitureData = [
       defaultHeight: "200px",
       description: "Full Bed",
       category: "Bed",
+      type: "furniture",
     },
     {
       itemKey: 2,
@@ -14,6 +15,7 @@ const furnitureData = [
       defaultHeight: "160px",
       description: "L Desk",
       category: "Desk",
+      type: "furniture",
     },
     {
       itemKey: 3,
@@ -22,6 +24,7 @@ const furnitureData = [
       defaultHeight: "50px",
       description: "SideTable",
       category: "Table",
+      type: "furniture",
     },
     {
       itemKey: 4,
@@ -30,6 +33,7 @@ const furnitureData = [
       defaultHeight: "80px",
       description: "Fern",
       category: "Plant",
+      type: "furniture",
     },
     {
       itemKey: 6,
@@ -38,6 +42,7 @@ const furnitureData = [
       defaultHeight: "100px",
       description: "Armchair",
       category: "idk",
+      type: "furniture",
     },
     {
       itemKey: 7,
@@ -46,6 +51,7 @@ const furnitureData = [
       defaultHeight: "100px",
       description: "Bean Bag",
       category: "idk",
+      type: "furniture",
     },
     {
       itemKey: 8,
@@ -54,6 +60,7 @@ const furnitureData = [
       defaultHeight: "250px",
       description: "Carpet",
       category: "idk",
+      type: "furniture",
     },
     {
       itemKey: 9,
@@ -62,6 +69,7 @@ const furnitureData = [
       defaultHeight: "115px",
       description: "Chair",
       category: "idk",
+      type: "furniture",
     },
     {
       itemKey: 10,
@@ -70,6 +78,7 @@ const furnitureData = [
       defaultHeight: "120px",
       description: "Chair",
       category: "idk",
+      type: "furniture",
     },
     {
       itemKey: 11,
@@ -78,6 +87,7 @@ const furnitureData = [
       defaultHeight: "165px",
       description: "Dining",
       category: "idk",
+      type: "furniture",
     },
     {
       itemKey: 12,
@@ -86,6 +96,7 @@ const furnitureData = [
       defaultHeight: "80px",
       description: "Lamp",
       category: "idk",
+      type: "furniture",
     },
     {
       itemKey: 13,
@@ -94,6 +105,7 @@ const furnitureData = [
       defaultHeight: "161px",
       description: "Couch",
       category: "idk",
+      type: "furniture",
     },
     {
       itemKey: 14,
@@ -102,6 +114,7 @@ const furnitureData = [
       defaultHeight: "80px",
       description: "Plant",
       category: "idk",
+      type: "furniture",
     },
     {
       itemKey: 15,
@@ -110,6 +123,7 @@ const furnitureData = [
       defaultHeight: "100px",
       description: "Fridge",
       category: "idk",
+      type: "furniture",
     },
     {
       itemKey: 16,
@@ -118,6 +132,7 @@ const furnitureData = [
       defaultHeight: "69px",
       description: "TV Stand",
       category: "idk",
+      type: "furniture",
     },
     {
       itemKey: 17,
@@ -126,6 +141,25 @@ const furnitureData = [
       defaultHeight: "115px",
       description: "Twin",
       category: "idk",
+      type: "furniture",
+    },
+    {
+      itemKey: 18,
+      url: "vectors/furniture/capybara.png",
+      defaultWidth: "180px",
+      defaultHeight: "140px",
+      description: "Capybara",
+      category: "idk",
+      type: "furniture",
+    },
+    {
+      itemKey: 19,
+      url: "vectors/furniture/duck.png",
+      defaultWidth: "200px",
+      defaultHeight: "200px",
+      description: "Duck",
+      category: "idk",
+      type: "furniture",
     },
     
   ];
