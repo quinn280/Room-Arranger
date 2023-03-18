@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view
 
 @api_view(['GET'])
 def getData(request):
-    return Response("sup")
+    return Response("hi")
 
 @api_view(['POST'])
 def testPost(request):

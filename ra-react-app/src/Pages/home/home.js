@@ -323,13 +323,13 @@ const Home = () => {
           ))}
           <Moveable
             individualGroupable={true}
-            individualGroupableProps={element => {
-              if (element.classList.contains("window")) {
-                return {
-                  resizable: false
-                };
-              }
-            }}
+            // individualGroupableProps={element => {
+            //   if (element.classList.contains("window")) {
+            //     return {
+            //       resizable: false
+            //     };
+            //   }
+            // }}
             flushSync={flushSync}
             ref={moveableRef}
             props={{
@@ -345,7 +345,7 @@ const Home = () => {
             renderDirections={["nw", "n", "ne", "w", "e", "sw", "s", "se"]}
             rotatable={true}
 
-            snappable={true}
+            snappable={(designMode === "furnish")}
             elementGuidelines={[".room"]}
             snapThreshold={6}
 
@@ -434,7 +434,7 @@ const Home = () => {
                 <br />
                 <div>Object Dimensions</div>
                 <br />
-                <label htmlFor="x">X:</label><br />
+                <label htmlFor="xyz">X:</label><br />
                 <input ref={xInputRef} {...requestCallbacksFurniture} type="number" id="x" name="x" /><br />
                 <label htmlFor="y">Y:</label><br />
                 <input ref={yInputRef} {...requestCallbacksFurniture} type="number" id="y" name="y" /><br />
