@@ -2,9 +2,12 @@ import React, { useState } from "react";
 import Moveable from "react-moveable";
 import Selecto from "react-selecto";
 import { flushSync } from "react-dom";
+import axios from 'axios';
 import './home.css';
 import furnitureList from "./furnitureData.js";
 import structureList from "./structureData.js"
+
+const apiurl = "http://127.0.0.1:8000/testpost/";
 
 
 const Home = () => {
@@ -219,12 +222,22 @@ const Home = () => {
     const roomHeight = document.getElementById("room").style.height;
     
 
-    const jsonStr = {};
-    jsonStr.room = {width: roomWidth, height: roomHeight};
-    jsonStr.activeObjects = _activeObjects;
+    const jsonObj = {};
+    jsonObj.room = {width: roomWidth, height: roomHeight};
+    jsonObj.activeObjects = _activeObjects;
 
-    console.log(JSON.stringify(jsonStr, undefined, 4));
-  }
+    const jsonStr = JSON.stringify(jsonObj, undefined, 4);
+    console.log("posted: ")
+    console.log(jsonStr);
+    console.log("response: ")
+    axios.post(apiurl, jsonObj)
+      .then(response => {
+        console.log(response.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+    }
 
 
   const bringFront = () => {
