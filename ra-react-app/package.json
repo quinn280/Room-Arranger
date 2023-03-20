@@ -16,8 +16,9 @@
     "react-flow-renderer": "^10.3.17",
     "react-moveable": "^0.47.1",
     "react-router-dom": "^6.8.2",
-    "react-scripts": "5.0.1",
+    "react-scripts": "^5.0.1",
     "react-selecto": "^1.22.0",
+    "sass": "^1.59.3",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -43,9 +44,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "sass": "^1.58.3"
   },
   "main": "index.js",
   "keywords": [],
