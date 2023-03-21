@@ -9,6 +9,24 @@ services:
     environment:
       - CHOKIDAR_USEPOLLING=true
       - WATCHPACK_POLLING=true
+    volumes:
+      - ./ra-react-app:/app/frontend
+      - /app/frontend/node_modules
     ports:
       - "3000:3000"    
     stdin_open: true
+
+  backend:
+    restart: always
+    container_name: django
+    command : bash -c "python manage.py runserver 0.0.0.0:8000"
+    build:
+      context: ./radjangoproject/
+      dockerfile: Dockerfile
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    volumes:
+    - ./radjangoproject:/app/backend
+    ports:
+      - "8000:8000"
