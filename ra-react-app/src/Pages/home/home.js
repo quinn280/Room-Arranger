@@ -18,7 +18,8 @@ const Home = () => {
   const [roomLock, setRoomLock] = useState(false);
   const [maxZ, setMaxZ] = useState(1);
   const [minZ, setMinZ] = useState(0);
-  
+  const [zoom, setZoom] = useState(1);
+
 
   const moveableRef = React.useRef(null);
   const selectoRef = React.useRef(null);
@@ -70,6 +71,10 @@ const Home = () => {
     };
   });
 
+  const handleZoomChange = (e, newZoom) => {
+    setZoom(newZoom);
+  }
+
   const [requestCallbacksRoom] = useState(() => {
 
     function request() {
@@ -97,6 +102,8 @@ const Home = () => {
       },
     };
   });
+
+ 
 
 
   const handleRemove = (uid) => {
@@ -217,13 +224,13 @@ const Home = () => {
       }
     })
 
-   
+
     const roomWidth = document.getElementById("room").style.width;
     const roomHeight = document.getElementById("room").style.height;
-    
+
 
     const jsonObj = {};
-    jsonObj.room = {width: roomWidth, height: roomHeight};
+    jsonObj.room = { width: roomWidth, height: roomHeight };
     jsonObj.activeObjects = _activeObjects;
 
     const jsonStr = JSON.stringify(jsonObj, undefined, 4);
@@ -237,14 +244,14 @@ const Home = () => {
       .catch(error => {
         console.log(error);
       });
-    }
+  }
 
 
   const bringFront = () => {
     // return if no item currently selected
     if (!moveableRef.current.refTargets || moveableRef.current.refTargets.length < 1)
       return;
-       
+
     const uid = moveableRef.current.refTargets[0].getAttribute("data-key");
     const _activeObjects = [...activeObjects]
     const foundItem = _activeObjects.find(f => f.uid === uid);
@@ -253,13 +260,13 @@ const Home = () => {
 
     foundItem.z = maxZ + 1;
     setMaxZ((prevMax) => prevMax + 1);
-    setActiveObjects(_activeObjects);   
+    setActiveObjects(_activeObjects);
   }
 
   const sendBack = () => {
     if (!moveableRef.current.refTargets || moveableRef.current.refTargets.length < 1)
       return;
-       
+
     const uid = moveableRef.current.refTargets[0].getAttribute("data-key");
     const _activeObjects = [...activeObjects]
     const foundItem = _activeObjects.find(f => f.uid === uid);
@@ -268,8 +275,34 @@ const Home = () => {
 
     foundItem.z = minZ - 1;
     setMinZ((prevMin) => prevMin - 1);
-    setActiveObjects(_activeObjects);  
+    setActiveObjects(_activeObjects);
   }
+
+  const DimensionViewable = {
+    name: "dimensionViewable",
+    props: {},
+    events: {},
+    render(moveable, React) {
+      const rect = moveable.getRect();
+  
+      return <div key={"dimension-viewer"} className={"moveable-dimension"} style={{
+        position: "absolute",
+        left: `${rect.width / 2}px`,
+        top: `${rect.height + 20}px`,
+        background: "#4af",
+        borderRadius: "2px",
+        padding: `${2}px ${4}px`,
+        color: "white",
+        fontSize: `${13 * 1/zoom}px`,
+        whiteSpace: "nowrap",
+        fontWeight: "bold",
+        willChange: "transform",
+        transform: `translate(-50%, 0px)`,
+      }}>
+        {Math.round(rect.offsetWidth)} x {Math.round(rect.offsetHeight)}
+      </div>;
+    },
+  };
 
 
   return (
@@ -299,8 +332,8 @@ const Home = () => {
           }
         </div>
       </div>
-      <div className="design-area">
-        <div className="room" ref={boxRef} id="room" style = {{width: "400px", height: "400px"}}>
+      <div className="design-area" style={{ zoom: zoom }}>
+        <div className="room" ref={boxRef} id="room" style={{ width: "400px", height: "400px" }}>
           {activeObjects.map((f) => (
             <img
               draggable="false"
@@ -317,19 +350,11 @@ const Home = () => {
                 zIndex: `${f.z}`,
                 width: `${f.width}`,
                 height: `${f.height}`,
-                transform: `translate(${f.x}, ${f.y}) rotate(${f.rotate})`
               }}
             />
           ))}
           <Moveable
-            individualGroupable={true}
-            // individualGroupableProps={element => {
-            //   if (element.classList.contains("window")) {
-            //     return {
-            //       resizable: false
-            //     };
-            //   }
-            // }}
+            rootContainer={document.body}
             flushSync={flushSync}
             ref={moveableRef}
             props={{
@@ -337,7 +362,7 @@ const Home = () => {
             }}
             ables={[DimensionViewable]}
             target={(designMode === "furnish") ? furnTargets : strucTargets}
-
+            zoom={1 / zoom}
             draggable={true}
             throttleDrag={1}
             throttleRotate={5}
@@ -345,9 +370,7 @@ const Home = () => {
             renderDirections={["nw", "n", "ne", "w", "e", "sw", "s", "se"]}
             rotatable={true}
 
-            snappable={(designMode === "furnish")}
-            elementGuidelines={[".room"]}
-            snapThreshold={6}
+            
 
             onDragStart={e => {
               e.target.focus();
@@ -407,6 +430,7 @@ const Home = () => {
           ></Selecto>
         </div>
         <Moveable
+          rootContainer={document.body}
           flushSync={flushSync}
           props={{
             dimensionViewable: true,
@@ -415,6 +439,7 @@ const Home = () => {
           target={(((designMode === "room") && !(roomLock)) ? ".room" : ".dummyvalue")}
           ref={boxRef}
           resizable={true}
+          zoom={1/zoom}
           onResize={(e) => {
             e.target.style.width = `${e.width}px`;
             e.target.style.height = `${e.height}px`;
@@ -430,21 +455,24 @@ const Home = () => {
           (designMode === "furnish")
             ?
             <div>
-              <form className="furnFormEntry" key="furnFormEntry">
-                <br />
-                <div>Object Dimensions</div>
-                <br />
-                <label htmlFor="xyz">X:</label><br />
-                <input ref={xInputRef} {...requestCallbacksFurniture} type="number" id="x" name="x" /><br />
-                <label htmlFor="y">Y:</label><br />
-                <input ref={yInputRef} {...requestCallbacksFurniture} type="number" id="y" name="y" /><br />
-                <label htmlFor="width">Width</label><br />
-                <input ref={widthInputRef} {...requestCallbacksFurniture} type="number" id="width" name="width" /><br />
-                <label htmlFor="height">Height</label><br />
-                <input ref={heightInputRef} {...requestCallbacksFurniture} type="number" id="height" name="height" /><br />
-                <label htmlFor="rotation">Rotation:</label><br />
-                <input ref={rotateInputRef} {...requestCallbacksFurniture} type="number" id="rotation" name="rotation" /><br />
-              </form>
+              <div>
+                <button onClick={(e) => {e.preventDefault(); handleZoomChange(e, zoom + .1);}}>Zoom In</button>
+                <button onClick={(e) => {e.preventDefault(); handleZoomChange(e, zoom - .1);}}>Zoom Out</button>
+              </div>
+              <br />
+              <br />
+              <div>Object Dimensions</div>
+              <br />
+              <label htmlFor="xyz">X:</label><br />
+              <input ref={xInputRef} {...requestCallbacksFurniture} type="number" id="x" name="x" /><br />
+              <label htmlFor="y">Y:</label><br />
+              <input ref={yInputRef} {...requestCallbacksFurniture} type="number" id="y" name="y" /><br />
+              <label htmlFor="width">Width</label><br />
+              <input ref={widthInputRef} {...requestCallbacksFurniture} type="number" id="width" name="width" /><br />
+              <label htmlFor="height">Height</label><br />
+              <input ref={heightInputRef} {...requestCallbacksFurniture} type="number" id="height" name="height" /><br />
+              <label htmlFor="rotation">Rotation:</label><br />
+              <input ref={rotateInputRef} {...requestCallbacksFurniture} type="number" id="rotation" name="rotation" /><br />
               <br /><br />
               <button onClick={clearFurniture}>Clear</button>
               <br /><br />
@@ -454,7 +482,12 @@ const Home = () => {
               <button onClick={exportData}>Dev: Send Furn Data to Back End</button>
             </div>
             :
-            <form className="roomFormEntry" key="roomFormEntry">
+            <div className="roomFormEntry" key="roomFormEntry">
+              <div>
+                <button onClick={(e) => {handleZoomChange(e, zoom + .1)}}>Zoom In</button>
+                <button onClick={(e) => {handleZoomChange(e, zoom - .1)}}>Zoom Out</button>
+              </div>
+              <br />
               <br />
               <div>Room Dimensions</div>
               <label htmlFor="roomWidth">Lock:</label>
@@ -482,7 +515,7 @@ const Home = () => {
               <input ref={rotateInputRef} {...requestCallbacksFurniture} type="number" id="rotation" name="rotation" /><br />
               <br /><br />
 
-            </form>
+            </div>
         }
         <div>
           <p className="tog">{designMode === "furnish" ? "Floor Plan" : "Furnish"}</p>
@@ -497,31 +530,7 @@ const Home = () => {
   );
 };
 
-const DimensionViewable = {
-  name: "dimensionViewable",
-  props: {},
-  events: {},
-  render(moveable, React) {
-    const rect = moveable.getRect();
 
-    return <div key={"dimension-viewer"} className={"moveable-dimension"} style={{
-      position: "absolute",
-      left: `${rect.width / 2}px`,
-      top: `${rect.height + 20}px`,
-      background: "#4af",
-      borderRadius: "2px",
-      padding: "2px 4px",
-      color: "white",
-      fontSize: "13px",
-      whiteSpace: "nowrap",
-      fontWeight: "bold",
-      willChange: "transform",
-      transform: `translate(-50%, 0px)`,
-    }}>
-      {Math.round(rect.offsetWidth)} x {Math.round(rect.offsetHeight)}
-    </div>;
-  },
-};
 
 
 
