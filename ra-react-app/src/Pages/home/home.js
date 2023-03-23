@@ -36,6 +36,11 @@ const Home = () => {
   const roomHeightInputRef = React.useRef(null);
 
   React.useEffect(() => {
+    initScrollOptions();
+    zoomFit();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const initScrollOptions = () => {
     setScrollOptions({
       container: viewerRef.current.getElement(),
       getScrollPosition: () => {
@@ -47,7 +52,7 @@ const Home = () => {
       throttleTime: 30,
       threshold: 0
     });
-  }, []);
+  }
 
   const [requestCallbacksFurniture] = useState(() => {
     function request() {
@@ -87,6 +92,8 @@ const Home = () => {
   });
 
   const handleZoomChange = (newZoom) => {
+    if (newZoom < .1 || newZoom > 10)
+      return;
     setZoom(newZoom);
   }
 
@@ -119,8 +126,6 @@ const Home = () => {
   });
 
 
-
-
   const handleRemove = (uid) => {
     const foundItem = activeObjects.find(f => f.uid === uid);
     const z = foundItem.z
@@ -131,11 +136,11 @@ const Home = () => {
       return;
 
     const _activeObjects = activeObjects.map(f => {
-        if (f.z > z) {
-          f.z -= 1;
-        }
-  
-        return f;
+      if (f.z > z) {
+        f.z -= 1;
+      }
+
+      return f;
     })
 
     setActiveObjects(_activeObjects.filter((f) => f.uid !== uid));
@@ -292,7 +297,7 @@ const Home = () => {
 
       return f;
     })
-    
+
     setActiveObjects(_activeObjects);
   }
 
@@ -314,7 +319,7 @@ const Home = () => {
 
       return f;
     })
-    
+
     setActiveObjects(_activeObjects);
   }
 
@@ -342,6 +347,87 @@ const Home = () => {
         {Math.round(rect.offsetWidth)} x {Math.round(rect.offsetHeight)}
       </div>;
     },
+  };
+
+  const zoomFit = (timeOut = 0) => {
+    var ivWidth = document
+      .getElementsByClassName("infinite-viewer")[0]
+      .getBoundingClientRect().width;
+    var ivHeight = document
+      .getElementsByClassName("infinite-viewer")[0]
+      .getBoundingClientRect().height;
+    var rWidth = parseInt(
+      document.getElementsByClassName("room")[0].style.width,
+      10
+    );
+    var rHeight = parseInt(
+      document.getElementsByClassName("room")[0].style.height,
+      10
+    );
+    var borderWidth = parseInt(
+      document.getElementsByClassName("room")[0].style.borderWidth,
+      10
+    );
+
+    console.log(ivWidth, ivHeight);
+    console.log(rWidth, rHeight);
+    console.log(borderWidth);
+
+    rWidth += 2 * borderWidth;
+    rHeight += 2 * borderWidth;
+
+    var x = getCenterPosLeft(ivWidth, rWidth);
+    var y = getCenterPosTop(ivHeight, rHeight);
+
+    var padX = 0.2 * ivWidth;
+    var padY = 0.2 * ivHeight;
+
+    var newZoom = getZoomFitValue(
+      ivWidth,
+      ivHeight,
+      rWidth,
+      rHeight,
+      padX,
+      padY
+    );
+
+    var xScroll = ((1 - 1 / newZoom) / 2) * ivWidth;
+    var yScroll = ((1 - 1 / newZoom) / 2) * ivHeight;
+
+    moveRoom(x, y);
+    setZoom(newZoom);
+
+    // schedule async callback
+    setTimeout(() => {
+      viewerRef.current.scrollTo(xScroll, yScroll);
+    }, 10);
+  };
+
+  const getZoomFitValue = (
+    ivWidth,
+    ivHeight,
+    rWidth,
+    rHeight,
+    padX = 0,
+    padY = 0
+  ) => {
+    var maxZoomX = (ivWidth - padX) / rWidth;
+    var maxZoomY = (ivHeight - padY) / rHeight;
+    return Math.min(maxZoomX, maxZoomY);
+  };
+
+  const getCenterPosLeft = (ivWidth, rWidth) => {
+    return ivWidth / 2 - rWidth / 2;
+  };
+
+  const getCenterPosTop = (ivHeight, rHeight) => {
+    return ivHeight / 2 - rHeight / 2;
+  };
+
+  const moveRoom = (x, y) => {
+    const room = document.getElementById("room");
+    room.style.transform = `translate(${x}px,${y}px)`;
+    boxRef.current.updateRect();
   };
 
 
@@ -375,7 +461,9 @@ const Home = () => {
       <div className="design-area-wrapper">
         <InfiniteViewer zoom={zoom} className="infinite-viewer" ref={viewerRef}>
           <div>
-            <div className="room" ref={boxRef} id="room" style={{ width: "400px", height: "400px" }}>
+            <div className="room" ref={boxRef} id="room" 
+            style={{ width: "400px", height: "400px", position: "absolute",
+                     borderWidth: "3px" }}>
               {activeObjects.map((f) => (
                 <img
                   draggable="false"
@@ -518,6 +606,7 @@ const Home = () => {
               <div>
                 <button onClick={(e) => { e.preventDefault(); handleZoomChange(zoom + .1); }}>Zoom In</button>
                 <button onClick={(e) => { e.preventDefault(); handleZoomChange(zoom - .1); }}>Zoom Out</button>
+                <button onClick={(e) => {e.preventDefault(); zoomFit();}}>Zoom Fit</button>
               </div>
               <br />
               <br />
@@ -544,8 +633,9 @@ const Home = () => {
             :
             <div className="roomFormEntry" key="roomFormEntry">
               <div>
-                <button onClick={(e) => {e.preventDefault(); handleZoomChange(zoom + .1); }}>Zoom In</button>
-                <button onClick={(e) => {e.preventDefault(); handleZoomChange(zoom - .1);}}>Zoom Out</button>
+                <button onClick={(e) => { e.preventDefault(); handleZoomChange(zoom + .1); }}>Zoom In</button>
+                <button onClick={(e) => { e.preventDefault(); handleZoomChange(zoom - .1); }}>Zoom Out</button>
+                <button onClick={(e) => {e.preventDefault(); zoomFit();}}>Zoom Fit</button>
               </div>
               <br />
               <br />

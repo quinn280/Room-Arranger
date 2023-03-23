@@ -71,13 +71,9 @@
 }
 
 .room {
-  border-width: "3px";
   border-color: black;
   border-style: solid;
   background-color: white;
-  position: absolute;
-  top: 100px;
-  left: 100px;
 }
 
 
