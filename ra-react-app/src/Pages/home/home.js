@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Moveable from "react-moveable";
 import Selecto from "react-selecto";
+import InfiniteViewer from "react-infinite-viewer";
 import { flushSync } from "react-dom";
 import axios from 'axios';
 import './home.css';
@@ -13,16 +14,17 @@ const apiurl = "http://127.0.0.1:8000/testpost/";
 const Home = () => {
   const [activeObjects, setActiveObjects] = useState([]);
   const [strucTargets, setStrucTargets] = useState([]);
+  const [scrollOptions, setScrollOptions] = useState({});
   const [furnTargets, setFurnTargets] = useState([]);
   const [designMode, setDesignMode] = useState("room");
   const [roomLock, setRoomLock] = useState(false);
-  const [maxZ, setMaxZ] = useState(1);
-  const [minZ, setMinZ] = useState(0);
-  
+  const [zoom, setZoom] = useState(1);
+
 
   const moveableRef = React.useRef(null);
   const selectoRef = React.useRef(null);
   const boxRef = React.useRef(null);
+  const viewerRef = React.useRef(null);
 
   const xInputRef = React.useRef(null);
   const yInputRef = React.useRef(null);
@@ -32,6 +34,25 @@ const Home = () => {
 
   const roomWidthInputRef = React.useRef(null);
   const roomHeightInputRef = React.useRef(null);
+
+  React.useEffect(() => {
+    initScrollOptions();
+    zoomFit();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const initScrollOptions = () => {
+    setScrollOptions({
+      container: viewerRef.current.getElement(),
+      getScrollPosition: () => {
+        return [
+          viewerRef.current.getScrollLeft(),
+          viewerRef.current.getScrollTop()
+        ];
+      },
+      throttleTime: 30,
+      threshold: 0
+    });
+  }
 
   const [requestCallbacksFurniture] = useState(() => {
     function request() {
@@ -70,6 +91,12 @@ const Home = () => {
     };
   });
 
+  const handleZoomChange = (newZoom) => {
+    if (newZoom < .1 || newZoom > 10)
+      return;
+    setZoom(newZoom);
+  }
+
   const [requestCallbacksRoom] = useState(() => {
 
     function request() {
@@ -101,13 +128,22 @@ const Home = () => {
 
   const handleRemove = (uid) => {
     const foundItem = activeObjects.find(f => f.uid === uid);
+    const z = foundItem.z
+
     if (designMode === "furnish" && foundItem.type === "structural")
       return;
-
     if (designMode === "room" && foundItem.type === "furniture")
       return;
 
-    setActiveObjects(activeObjects.filter((f) => f.uid !== uid));
+    const _activeObjects = activeObjects.map(f => {
+      if (f.z > z) {
+        f.z -= 1;
+      }
+
+      return f;
+    })
+
+    setActiveObjects(_activeObjects.filter((f) => f.uid !== uid));
     if (designMode === "room")
       setStrucTargets([]);
     else
@@ -119,7 +155,7 @@ const Home = () => {
     const foundItem = activeList.find(f => parseInt(f.itemKey) === parseInt(itemKey));
     const newActvObj = Object.assign({}, foundItem);
     newActvObj.uid = generateUID();
-    newActvObj.z = maxZ + 1;
+    newActvObj.z = activeObjects.length + 1;
     newActvObj.width = newActvObj.defaultWidth;
     newActvObj.height = newActvObj.defaultHeight;
 
@@ -128,11 +164,13 @@ const Home = () => {
     var newObjX = parseInt((parseInt(roomWidth, 10) / 2) - (parseInt(newActvObj.width, 10) / 2), 10);
     var newObjY = parseInt((parseInt(roomHeight, 10) / 2) - (parseInt(newActvObj.height, 10) / 2), 10);
 
+    console.log(newObjX);
+    console.log(newObjY);
+
     newActvObj.rotate = "0deg";
     newActvObj.x = `${newObjX}px`;
     newActvObj.y = `${newObjY}px`;
 
-    setMaxZ(prevZ => prevZ + 1);
     setActiveObjects(oldArray => [...oldArray, newActvObj]);
   }
 
@@ -217,13 +255,13 @@ const Home = () => {
       }
     })
 
-   
+
     const roomWidth = document.getElementById("room").style.width;
     const roomHeight = document.getElementById("room").style.height;
-    
+
 
     const jsonObj = {};
-    jsonObj.room = {width: roomWidth, height: roomHeight};
+    jsonObj.room = { width: roomWidth, height: roomHeight };
     jsonObj.activeObjects = _activeObjects;
 
     const jsonStr = JSON.stringify(jsonObj, undefined, 4);
@@ -237,39 +275,160 @@ const Home = () => {
       .catch(error => {
         console.log(error);
       });
-    }
+  }
 
 
   const bringFront = () => {
     // return if no item currently selected
     if (!moveableRef.current.refTargets || moveableRef.current.refTargets.length < 1)
       return;
-       
-    const uid = moveableRef.current.refTargets[0].getAttribute("data-key");
-    const _activeObjects = [...activeObjects]
-    const foundItem = _activeObjects.find(f => f.uid === uid);
-    if (foundItem.z === maxZ)
-      return;
 
-    foundItem.z = maxZ + 1;
-    setMaxZ((prevMax) => prevMax + 1);
-    setActiveObjects(_activeObjects);   
+    const uid = moveableRef.current.refTargets[0].getAttribute("data-key");
+    const foundItem = activeObjects.find(f => f.uid === uid);
+    const oldZ = foundItem.z;
+
+    const _activeObjects = activeObjects.map(f => {
+      if (uid === f.uid) {
+        f.z = activeObjects.length;
+      }
+      else if (f.z > oldZ) {
+        f.z -= 1;
+      }
+
+      return f;
+    })
+
+    setActiveObjects(_activeObjects);
   }
 
   const sendBack = () => {
     if (!moveableRef.current.refTargets || moveableRef.current.refTargets.length < 1)
       return;
-       
-    const uid = moveableRef.current.refTargets[0].getAttribute("data-key");
-    const _activeObjects = [...activeObjects]
-    const foundItem = _activeObjects.find(f => f.uid === uid);
-    if (foundItem.z === minZ)
-      return;
 
-    foundItem.z = minZ - 1;
-    setMinZ((prevMin) => prevMin - 1);
-    setActiveObjects(_activeObjects);  
+    const uid = moveableRef.current.refTargets[0].getAttribute("data-key");
+    const foundItem = activeObjects.find(f => f.uid === uid);
+    const oldZ = foundItem.z;
+
+    const _activeObjects = activeObjects.map(f => {
+      if (uid === f.uid) {
+        f.z = 1;
+      }
+      else if (f.z < oldZ) {
+        f.z += 1;
+      }
+
+      return f;
+    })
+
+    setActiveObjects(_activeObjects);
   }
+
+  const DimensionViewable = {
+    name: "dimensionViewable",
+    props: {},
+    events: {},
+    render(moveable, React) {
+      const rect = moveable.getRect();
+
+      return <div key={"dimension-viewer"} className={"moveable-dimension"} style={{
+        position: "absolute",
+        left: `${rect.width / 2}px`,
+        top: `${rect.height + 20}px`,
+        background: "#4af",
+        borderRadius: "2px",
+        padding: `${2}px ${4}px`,
+        color: "white",
+        fontSize: `${13 * 1 / zoom}px`,
+        whiteSpace: "nowrap",
+        fontWeight: "bold",
+        willChange: "transform",
+        transform: `translate(-50%, 0px)`,
+      }}>
+        {Math.round(rect.offsetWidth)} x {Math.round(rect.offsetHeight)}
+      </div>;
+    },
+  };
+
+  const zoomFit = (timeOut = 0) => {
+    var ivWidth = document
+      .getElementsByClassName("infinite-viewer")[0]
+      .getBoundingClientRect().width;
+    var ivHeight = document
+      .getElementsByClassName("infinite-viewer")[0]
+      .getBoundingClientRect().height;
+    var rWidth = parseInt(
+      document.getElementsByClassName("room")[0].style.width,
+      10
+    );
+    var rHeight = parseInt(
+      document.getElementsByClassName("room")[0].style.height,
+      10
+    );
+    var borderWidth = parseInt(
+      document.getElementsByClassName("room")[0].style.borderWidth,
+      10
+    );
+
+    console.log(ivWidth, ivHeight);
+    console.log(rWidth, rHeight);
+    console.log(borderWidth);
+
+    rWidth += 2 * borderWidth;
+    rHeight += 2 * borderWidth;
+
+    var x = getCenterPosLeft(ivWidth, rWidth);
+    var y = getCenterPosTop(ivHeight, rHeight);
+
+    var padX = 0.2 * ivWidth;
+    var padY = 0.2 * ivHeight;
+
+    var newZoom = getZoomFitValue(
+      ivWidth,
+      ivHeight,
+      rWidth,
+      rHeight,
+      padX,
+      padY
+    );
+
+    var xScroll = ((1 - 1 / newZoom) / 2) * ivWidth;
+    var yScroll = ((1 - 1 / newZoom) / 2) * ivHeight;
+
+    moveRoom(x, y);
+    setZoom(newZoom);
+
+    // schedule async callback
+    setTimeout(() => {
+      viewerRef.current.scrollTo(xScroll, yScroll);
+    }, 10);
+  };
+
+  const getZoomFitValue = (
+    ivWidth,
+    ivHeight,
+    rWidth,
+    rHeight,
+    padX = 0,
+    padY = 0
+  ) => {
+    var maxZoomX = (ivWidth - padX) / rWidth;
+    var maxZoomY = (ivHeight - padY) / rHeight;
+    return Math.min(maxZoomX, maxZoomY);
+  };
+
+  const getCenterPosLeft = (ivWidth, rWidth) => {
+    return ivWidth / 2 - rWidth / 2;
+  };
+
+  const getCenterPosTop = (ivHeight, rHeight) => {
+    return ivHeight / 2 - rHeight / 2;
+  };
+
+  const moveRoom = (x, y) => {
+    const room = document.getElementById("room");
+    room.style.transform = `translate(${x}px,${y}px)`;
+    boxRef.current.updateRect();
+  };
 
 
   return (
@@ -299,152 +458,170 @@ const Home = () => {
           }
         </div>
       </div>
-      <div className="design-area">
-        <div className="room" ref={boxRef} id="room" style = {{width: "400px", height: "400px"}}>
-          {activeObjects.map((f) => (
-            <img
-              draggable="false"
-              src={f.url}
-              key={f.uid}
-              data-key={f.uid}
-              className={`${f.type === "furniture" ? "furn-target" : "struc-target"} ${f.category}`}
-              alt={f.description}
-              onKeyDown={onKeyPressed}
-              tabIndex="-1"
-              style={{
-                draggable: false,
-                position: "absolute",
-                zIndex: `${f.z}`,
-                width: `${f.width}`,
-                height: `${f.height}`,
-                transform: `translate(${f.x}, ${f.y}) rotate(${f.rotate})`
+      <div className="design-area-wrapper">
+        <InfiniteViewer zoom={zoom} className="infinite-viewer" ref={viewerRef}>
+          <div>
+            <div className="room" ref={boxRef} id="room" 
+            style={{ width: "400px", height: "400px", position: "absolute",
+                     borderWidth: "3px" }}>
+              {activeObjects.map((f) => (
+                <img
+                  draggable="false"
+                  src={f.url}
+                  key={f.uid}
+                  data-key={f.uid}
+                  className={`${f.type === "furniture" ? "furn-target" : "struc-target"} ${f.category}`}
+                  alt={f.description}
+                  onKeyDown={onKeyPressed}
+                  tabIndex="-1"
+                  style={{
+                    draggable: false,
+                    position: "absolute",
+                    zIndex: `${f.z}`,
+                    width: `${f.width}`,
+                    height: `${f.height}`,
+                    transform: `translate(${f.x}, ${f.y})`
+                  }}
+                />
+              ))}
+              <Moveable
+                rootContainer={document.body}
+                flushSync={flushSync}
+                ref={moveableRef}
+                props={{
+                  dimensionViewable: true,
+                }}
+                ables={[DimensionViewable]}
+                target={(designMode === "furnish") ? furnTargets : strucTargets}
+                zoom={1 / zoom}
+                draggable={true}
+                throttleDrag={1}
+                throttleRotate={5}
+                resizable={true}
+                renderDirections={["nw", "n", "ne", "w", "e", "sw", "s", "se"]}
+                rotatable={true}
+                scrollable={true}
+                scrollOptions={scrollOptions}
+                onScroll={({ direction }) => {
+                  viewerRef.current.scrollBy(
+                    direction[0] * 10,
+                    direction[1] * 10
+                  );
+                }}
+
+
+                onDragStart={e => {
+                  e.target.focus();
+                }}
+                onDrag={e => {
+                  e.target.style.transform = e.transform;
+                }}
+                onRotate={e => {
+                  e.target.style.transform = e.drag.transform;
+                }}
+                onResize={e => {
+                  e.target.style.width = `${e.width}px`;
+                  e.target.style.height = `${e.height}px`;
+                  e.target.style.transform = e.drag.transform;
+                }}
+                onDragEnd={e => {
+                  updateFurnitureForm(e);
+                }}
+                onRotateEnd={e => {
+                  updateFurnitureForm(e);
+                }}
+                onResizeEnd={e => {
+                  updateFurnitureForm(e);
+                }}
+              ></Moveable>
+              <Selecto
+                ref={selectoRef}
+                selectableTargets={(designMode === "furnish") ? [".furn-target"] : [".struc-target"]}
+                dragContainer={".room"}
+                hitRate={0}
+                selectByClick={true}
+                selectFromInside={false}
+                ratio={0}
+                onDragStart={e => {
+                  const moveable = moveableRef.current;
+                  const target = e.inputEvent.target;
+                  const activeTargets = (designMode === "furnish") ? furnTargets : strucTargets;
+                  if (moveable.isMoveableElement(target) || activeTargets.some(t => t === target || t.contains(target))) {
+                    e.stop();
+                  }
+                }}
+                onSelectEnd={e => {
+                  const moveable = moveableRef.current;
+                  if (designMode === "furnish")
+                    setFurnTargets(e.selected);
+                  else
+                    setStrucTargets(e.selected);
+
+                  if (e.isDragStart) {
+                    e.inputEvent.preventDefault();
+
+                    setTimeout(() => {
+                      moveable.dragStart(e.inputEvent);
+                    });
+                  }
+                }}
+              ></Selecto>
+            </div>
+            <Moveable
+              rootContainer={document.body}
+              flushSync={flushSync}
+              props={{
+                dimensionViewable: true,
               }}
-            />
-          ))}
-          <Moveable
-            individualGroupable={true}
-            // individualGroupableProps={element => {
-            //   if (element.classList.contains("window")) {
-            //     return {
-            //       resizable: false
-            //     };
-            //   }
-            // }}
-            flushSync={flushSync}
-            ref={moveableRef}
-            props={{
-              dimensionViewable: true,
-            }}
-            ables={[DimensionViewable]}
-            target={(designMode === "furnish") ? furnTargets : strucTargets}
-
-            draggable={true}
-            throttleDrag={1}
-            throttleRotate={5}
-            resizable={true}
-            renderDirections={["nw", "n", "ne", "w", "e", "sw", "s", "se"]}
-            rotatable={true}
-
-            snappable={(designMode === "furnish")}
-            elementGuidelines={[".room"]}
-            snapThreshold={6}
-
-            onDragStart={e => {
-              e.target.focus();
-            }}
-            onDrag={e => {
-              e.target.style.transform = e.transform;
-            }}
-            onRotate={e => {
-              e.target.style.transform = e.drag.transform;
-            }}
-            onResize={e => {
-              e.target.style.width = `${e.width}px`;
-              e.target.style.height = `${e.height}px`;
-              e.target.style.transform = e.drag.transform;
-            }}
-            onDragEnd={e => {
-              updateFurnitureForm(e);
-            }}
-            onRotateEnd={e => {
-              updateFurnitureForm(e);
-            }}
-            onResizeEnd={e => {
-              updateFurnitureForm(e);
-            }}
-          ></Moveable>
-          <Selecto
-            ref={selectoRef}
-            selectableTargets={(designMode === "furnish") ? [".furn-target"] : [".struc-target"]}
-            dragContainer={".room"}
-            hitRate={0}
-            selectByClick={true}
-            selectFromInside={false}
-            ratio={0}
-            onDragStart={e => {
-              const moveable = moveableRef.current;
-              const target = e.inputEvent.target;
-              const activeTargets = (designMode === "furnish") ? furnTargets : strucTargets;
-              if (moveable.isMoveableElement(target) || activeTargets.some(t => t === target || t.contains(target))) {
-                e.stop();
-              }
-            }}
-            onSelectEnd={e => {
-              const moveable = moveableRef.current;
-              if (designMode === "furnish")
-                setFurnTargets(e.selected);
-              else
-                setStrucTargets(e.selected);
-
-              if (e.isDragStart) {
-                e.inputEvent.preventDefault();
-
-                setTimeout(() => {
-                  moveable.dragStart(e.inputEvent);
-                });
-              }
-            }}
-          ></Selecto>
-        </div>
-        <Moveable
-          flushSync={flushSync}
-          props={{
-            dimensionViewable: true,
-          }}
-          ables={[DimensionViewable]}
-          target={(((designMode === "room") && !(roomLock)) ? ".room" : ".dummyvalue")}
-          ref={boxRef}
-          resizable={true}
-          onResize={(e) => {
-            e.target.style.width = `${e.width}px`;
-            e.target.style.height = `${e.height}px`;
-            e.target.style.transform = e.drag.transform;
-          }}
-          onResizeEnd={e => {
-            updateRoomForm(e);
-          }}
-        ></Moveable>
+              ables={[DimensionViewable]}
+              target={(((designMode === "room") && !(roomLock)) ? ".room" : ".dummyvalue")}
+              scrollable={true}
+              scrollOptions={scrollOptions}
+              ref={boxRef}
+              resizable={true}
+              zoom={1 / zoom}
+              onResize={(e) => {
+                e.target.style.width = `${e.width}px`;
+                e.target.style.height = `${e.height}px`;
+                e.target.style.transform = e.drag.transform;
+              }}
+              onResizeEnd={e => {
+                updateRoomForm(e);
+              }}
+              onScroll={({ direction }) => {
+                viewerRef.current.scrollBy(
+                  direction[0] * 10,
+                  direction[1] * 10
+                );
+              }}
+            ></Moveable>
+          </div>
+        </InfiniteViewer>
       </div>
       <div className="right-bar">
         {
           (designMode === "furnish")
             ?
             <div>
-              <form className="furnFormEntry" key="furnFormEntry">
-                <br />
-                <div>Object Dimensions</div>
-                <br />
-                <label htmlFor="xyz">X:</label><br />
-                <input ref={xInputRef} {...requestCallbacksFurniture} type="number" id="x" name="x" /><br />
-                <label htmlFor="y">Y:</label><br />
-                <input ref={yInputRef} {...requestCallbacksFurniture} type="number" id="y" name="y" /><br />
-                <label htmlFor="width">Width</label><br />
-                <input ref={widthInputRef} {...requestCallbacksFurniture} type="number" id="width" name="width" /><br />
-                <label htmlFor="height">Height</label><br />
-                <input ref={heightInputRef} {...requestCallbacksFurniture} type="number" id="height" name="height" /><br />
-                <label htmlFor="rotation">Rotation:</label><br />
-                <input ref={rotateInputRef} {...requestCallbacksFurniture} type="number" id="rotation" name="rotation" /><br />
-              </form>
+              <div>
+                <button onClick={(e) => { e.preventDefault(); handleZoomChange(zoom + .1); }}>Zoom In</button>
+                <button onClick={(e) => { e.preventDefault(); handleZoomChange(zoom - .1); }}>Zoom Out</button>
+                <button onClick={(e) => {e.preventDefault(); zoomFit();}}>Zoom Fit</button>
+              </div>
+              <br />
+              <br />
+              <div>Object Dimensions</div>
+              <br />
+              <label htmlFor="xyz">X:</label><br />
+              <input ref={xInputRef} {...requestCallbacksFurniture} type="number" id="x" name="x" /><br />
+              <label htmlFor="y">Y:</label><br />
+              <input ref={yInputRef} {...requestCallbacksFurniture} type="number" id="y" name="y" /><br />
+              <label htmlFor="width">Width</label><br />
+              <input ref={widthInputRef} {...requestCallbacksFurniture} type="number" id="width" name="width" /><br />
+              <label htmlFor="height">Height</label><br />
+              <input ref={heightInputRef} {...requestCallbacksFurniture} type="number" id="height" name="height" /><br />
+              <label htmlFor="rotation">Rotation:</label><br />
+              <input ref={rotateInputRef} {...requestCallbacksFurniture} type="number" id="rotation" name="rotation" /><br />
               <br /><br />
               <button onClick={clearFurniture}>Clear</button>
               <br /><br />
@@ -454,7 +631,13 @@ const Home = () => {
               <button onClick={exportData}>Dev: Send Furn Data to Back End</button>
             </div>
             :
-            <form className="roomFormEntry" key="roomFormEntry">
+            <div className="roomFormEntry" key="roomFormEntry">
+              <div>
+                <button onClick={(e) => { e.preventDefault(); handleZoomChange(zoom + .1); }}>Zoom In</button>
+                <button onClick={(e) => { e.preventDefault(); handleZoomChange(zoom - .1); }}>Zoom Out</button>
+                <button onClick={(e) => {e.preventDefault(); zoomFit();}}>Zoom Fit</button>
+              </div>
+              <br />
               <br />
               <div>Room Dimensions</div>
               <label htmlFor="roomWidth">Lock:</label>
@@ -482,7 +665,7 @@ const Home = () => {
               <input ref={rotateInputRef} {...requestCallbacksFurniture} type="number" id="rotation" name="rotation" /><br />
               <br /><br />
 
-            </form>
+            </div>
         }
         <div>
           <p className="tog">{designMode === "furnish" ? "Floor Plan" : "Furnish"}</p>
@@ -493,43 +676,9 @@ const Home = () => {
         </div>
       </div>
     </div>
-
   );
-};
-
-const DimensionViewable = {
-  name: "dimensionViewable",
-  props: {},
-  events: {},
-  render(moveable, React) {
-    const rect = moveable.getRect();
-
-    return <div key={"dimension-viewer"} className={"moveable-dimension"} style={{
-      position: "absolute",
-      left: `${rect.width / 2}px`,
-      top: `${rect.height + 20}px`,
-      background: "#4af",
-      borderRadius: "2px",
-      padding: "2px 4px",
-      color: "white",
-      fontSize: "13px",
-      whiteSpace: "nowrap",
-      fontWeight: "bold",
-      willChange: "transform",
-      transform: `translate(-50%, 0px)`,
-    }}>
-      {Math.round(rect.offsetWidth)} x {Math.round(rect.offsetHeight)}
-    </div>;
-  },
 };
 
 
 
 export default Home;
-
-
-
-
-
-
-
