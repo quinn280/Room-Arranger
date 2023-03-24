@@ -5,6 +5,8 @@
 ```
 ## Build
 docker compose build
+
+## May want to also remove all volumes/images/containers as well
 ```
 
 ```
@@ -14,15 +16,15 @@ docker compose up frontend  ## Run Just Frontend
 docker compose up backend   ## Run Just Backend
 ```
 
-Website: localhost:3000
-Backend: localhost:8000 (can directly test api here)
+Website: localhost:3000   
+Backend: localhost:8000 (can directly test api here)   
 
 ## API Format
 
 Notes: 
 1. X and Y refer to the distance from the top left corner of the room to the top left corner of the object
 2. X, Y, Width, Height are the values when the object has 0 rotation. If there is non-zero rotation, the resulting dimensions and position needs to be calculated.
-3. Rotation values can exceed [-360, 360], ie 900deg == 180deg
+3. Rotation values are in degrees in range [0, 360]. X, Y, Width, Height values are inches.
 
 This room layout exports the following JSON data
 
@@ -31,59 +33,58 @@ This room layout exports the following JSON data
 ```
 {
     "room": {
-        "width": "365px",
-        "height": "286px"
+        "width": 168,
+        "height": 144
     },
     "activeObjects": [
         {
+            "itemKey": 51,
+            "url": "vectors/structural/rightdoor.svg",
+            "defaultWidth": 40,
+            "defaultHeight": 40,
+            "description": "Right Door",
+            "category": "door",
+            "type": "structural",
+            "uid": "lflzfbjptur5tvd1mno",
+            "z": 1,
+            "width": 40,
+            "height": 40,
+            "rotate": 180,
+            "x": 129,
+            "y": -8.667
+        },
+        {
             "itemKey": 1,
             "url": "vectors/furniture/bed.svg",
-            "defaultWidth": "200px",
-            "defaultHeight": "200px",
+            "defaultWidth": 80,
+            "defaultHeight": 80,
             "description": "Full Bed",
             "category": "Bed",
             "type": "furniture",
-            "uid": "lfds4xkdv8vx1ts57h",
+            "uid": "lflzfo4ur5uenh6qtqe",
             "z": 2,
-            "width": "175px",
-            "height": "190px",
-            "rotate": "0deg",
-            "x": "-3px",
-            "y": "-3px"
-        },
-        {
-            "itemKey": 50,
-            "url": "vectors/structural/leftdoor.svg",
-            "defaultWidth": "100px",
-            "defaultHeight": "100px",
-            "description": "Left Door",
-            "category": "door",
-            "type": "structural",
-            "uid": "lfds63mgzbjn33dz71b",
-            "z": 5,
-            "width": "100px",
-            "height": "100px",
-            "rotate": "180deg",
-            "x": "268px",
-            "y": "-23px"
+            "width": 80,
+            "height": 90,
+            "rotate": 0,
+            "x": 0,
+            "y": 0
         },
         {
             "itemKey": 2,
             "url": "vectors/furniture/desk.svg",
-            "defaultWidth": "210px",
-            "defaultHeight": "160px",
+            "defaultWidth": 84,
+            "defaultHeight": 64,
             "description": "L Desk",
             "category": "Desk",
             "type": "furniture",
-            "uid": "lfds93qkrsfpxoj2m6l",
-            "z": 9,
-            "width": "181px",
-            "height": "136px",
-            "rotate": "-90deg",
-            "x": "200px",
-            "y": "123px"
+            "uid": "lflzfzx7ihsoom9lv6a",
+            "z": 3,
+            "width": 84,
+            "height": 64,
+            "rotate": 270,
+            "x": 93,
+            "y": 69.333
         }
     ]
 }
 ```
-
