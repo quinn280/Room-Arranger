@@ -10,8 +10,11 @@ import structureList from "./structureData.js"
 
 const apiurl = "http://127.0.0.1:8000/testpost/";
 const inchPixelRatio = 3;
-const initRoomWidth = "168in"
-const initRoomHeight = "144in"
+const defaultRoomDimensions = {
+  width: "168in",
+  height: "144in"
+}
+const Modes = Object.freeze({room:"room",furnish:"furnish"}) // modes enum
 
 const inchToPx = (inches) => {
   inches = parseFloat(inches);
@@ -55,13 +58,17 @@ const parseTransform = (transformText) => {
 }
 
 
+
+
 const Home = () => {
-  const [activeObjects, setActiveObjects] = useState([]);
+  const [activeObjects, setActiveObjects] = useState((localStorage.activeObjects) ? JSON.parse(localStorage.activeObjects) : []);
+  const [roomDimensions] = useState((localStorage.roomDimensions) ? JSON.parse(localStorage.roomDimensions) : defaultRoomDimensions)
   const [strucTargets, setStrucTargets] = useState([]);
   const [scrollOptions, setScrollOptions] = useState({});
   const [furnTargets, setFurnTargets] = useState([]);
-  const [designMode, setDesignMode] = useState("room");
-  const [roomLock, setRoomLock] = useState(false);
+
+  const [designMode, setDesignMode] = useState(localStorage.designMode || Modes.room);
+  const [roomLock, setRoomLock] = useState((localStorage.roomLock) ? JSON.parse(localStorage.roomLock) : false);
   const [zoom, setZoom] = useState(1);
 
   const moveableRef = React.useRef(null);
@@ -168,21 +175,24 @@ const Home = () => {
     const foundItem = activeObjects.find(f => f.uid === uid);
     const z = foundItem.z
 
-    if (designMode === "furnish" && foundItem.type === "structural")
+    if (designMode === Modes.furnish && foundItem.type === "structural")
       return;
-    if (designMode === "room" && foundItem.type === "furniture")
+    if (designMode === Modes.room && foundItem.type === "furniture")
       return;
 
-    const _activeObjects = activeObjects.map(f => {
+    var _activeObjects = activeObjects.map(f => {
       if (f.z > z) {
         f.z -= 1;
       }
 
       return f;
     })
+    _activeObjects = _activeObjects.filter((f) => f.uid !== uid)
 
-    setActiveObjects(_activeObjects.filter((f) => f.uid !== uid));
-    if (designMode === "room")
+    setActiveObjects(() => _activeObjects);
+    localStorage.activeObjects = JSON.stringify(_activeObjects);
+
+    if (designMode === Modes.room)
       setStrucTargets([]);
     else
       setFurnTargets([]);
@@ -191,41 +201,53 @@ const Home = () => {
   const handleZoomChange = (newZoom) => {
     if (newZoom < .1 || newZoom > 10)
       return;
+
     setZoom(newZoom);
   }
 
   const handleAdd = (itemKey) => {
-    const activeList = (designMode === "room" ? structureList : furnitureList);
+    const activeList = (designMode === Modes.room ? structureList : furnitureList);
     const foundItem = activeList.find(f => parseInt(f.itemKey) === parseInt(itemKey));
+
     const newActvObj = Object.assign({}, foundItem);
     newActvObj.uid = generateUID();
-    newActvObj.z = activeObjects.length + 1;
+    newActvObj.z = activeObjects.length + 1; // initialize to top z-index
     newActvObj.width = newActvObj.defaultWidth;
     newActvObj.height = newActvObj.defaultHeight;
-
-    const roomWidth = document.getElementById("room").style.width;
-    const roomHeight = document.getElementById("room").style.height;
-    var newObjX = parseFloat(roomWidth / 2 - newActvObj.width / 2);
-    var newObjY = parseFloat(roomHeight / 2 - newActvObj.height / 2);
-
     newActvObj.rotate = 0;
+
+    const roomWidth = pxToInch(document.getElementById("room").style.width);
+    const roomHeight = pxToInch(document.getElementById("room").style.height);
+    var newObjX = roomWidth / 2 - newActvObj.width / 2; // initialize in center
+    var newObjY = roomHeight / 2 - newActvObj.height / 2;
     newActvObj.x = newObjX;
     newActvObj.y = newObjY;
 
-    setActiveObjects(oldArray => [...oldArray, newActvObj]);
+    const _activeObjects = [...activeObjects, newActvObj];
+    localStorage.activeObjects = JSON.stringify(_activeObjects);
+    setActiveObjects(() => _activeObjects);
   }
 
-  
-
   const clearFurniture = () => {
-    setActiveObjects(activeObjects.filter((f) => f.type !== "furniture"));
+    const _activeObjects = activeObjects.filter((f) => f.type !== "furniture");
+    
     setFurnTargets([]);
+    localStorage.activeObjects = JSON.stringify(_activeObjects);
+    setActiveObjects(() => _activeObjects);
   }
 
   const handleModeChange = (e) => {
     const checked = e.target.checked;
-    setDesignMode(checked ? "furnish" : "room");
+    const newMode = (checked ? Modes.furnish : Modes.room)
+    setDesignMode(newMode);
+    localStorage.designMode = newMode;
   };
+
+  const handleRoomLockChange = (e) => {
+    const checked = e.target.checked;
+    setRoomLock(checked);
+    localStorage.roomLock = JSON.stringify(checked);
+  }
 
   const onKeyPressed = (e) => {
     const keyCode = e.keyCode;
@@ -235,8 +257,6 @@ const Home = () => {
       handleRemove(dataKey);
     }
   };
-
-  
 
   const updateFurnitureForm = (e) => {
     requestAnimationFrame(() => {
@@ -257,44 +277,12 @@ const Home = () => {
     })
   };
 
-
-
-  
-
   const exportData = () => {
-    const _activeObjects = [...activeObjects];
-    const child = document.getElementById("room").childNodes;
-    child.forEach((c) => {
-      if (c.classList.contains("furn-target") || c.classList.contains("struc-target")) {
-        // get values from html element
-        const uid = c.getAttribute("data-key");
-        const w = c.style.width;
-        const h = c.style.height;
-        const t = parseTransform(c.style.transform);
-
-        // find corresponding item in activeObjects
-        const foundItem = _activeObjects.find(f => f.uid === uid);
-        foundItem.width = round(pxToInch(w), 3);
-        foundItem.height = round(pxToInch(h), 3);
-        foundItem.x = round(pxToInch(t.x), 3);
-        foundItem.y = round(pxToInch(t.y), 3);
-        foundItem.rotate = normalizeRotation(t.rotate);
-      }
-    })
-
-
-    var roomWidth = document.getElementById("room").style.width;
-    var roomHeight = document.getElementById("room").style.height;
-
-    roomWidth = round(pxToInch(roomWidth), 3);
-    roomHeight = round(pxToInch(roomHeight), 3);
-
-
     const jsonObj = {};
-    jsonObj.room = { width: roomWidth, height: roomHeight };
-    jsonObj.activeObjects = _activeObjects;
-
+    jsonObj.roomDimensions = roomDimensions;
+    jsonObj.activeObjects = activeObjects;
     const jsonStr = JSON.stringify(jsonObj, undefined, 4);
+
     console.log("posted: ")
     console.log(jsonStr);
     console.log("response: ")
@@ -306,7 +294,6 @@ const Home = () => {
         console.log(error);
       });
   }
-
 
   const bringFront = () => {
     // return if no item currently selected
@@ -328,7 +315,8 @@ const Home = () => {
       return f;
     })
 
-    setActiveObjects(_activeObjects);
+    setActiveObjects(() => _activeObjects);
+    localStorage.activeObjects = JSON.stringify(_activeObjects);
   }
 
   const sendBack = () => {
@@ -350,7 +338,8 @@ const Home = () => {
       return f;
     })
 
-    setActiveObjects(_activeObjects);
+    setActiveObjects(() => _activeObjects);
+    localStorage.activeObjects = JSON.stringify(_activeObjects);
   }
 
   const DimensionViewable = {
@@ -402,8 +391,8 @@ const Home = () => {
     rWidth += 2 * borderWidth;
     rHeight += 2 * borderWidth;
 
-    var x = getCenterPosLeft(ivWidth, rWidth);
-    var y = getCenterPosTop(ivHeight, rHeight);
+    var x = ivWidth / 2 - rWidth / 2;
+    var y = ivHeight / 2 - rHeight / 2;
 
     var padX = 0.2 * ivWidth;
     var padY = 0.2 * ivHeight;
@@ -442,27 +431,18 @@ const Home = () => {
     return Math.min(maxZoomX, maxZoomY);
   };
 
-  const getCenterPosLeft = (ivWidth, rWidth) => {
-    return ivWidth / 2 - rWidth / 2;
-  };
-
-  const getCenterPosTop = (ivHeight, rHeight) => {
-    return ivHeight / 2 - rHeight / 2;
-  };
-
   const moveRoom = (x, y) => {
     const room = document.getElementById("room");
     room.style.transform = `translate(${x}px,${y}px)`;
     boxRef.current.updateRect();
   };
 
-
   return (
     <div className="home-page">
       <div className="left-bar">
         <div className="card-container">
           {
-            (designMode === "room")
+            (designMode === Modes.room)
               ?
               structureList.map((f) => (
                 <div className="card structure" key={f.itemKey} data-key={f.itemKey} onClick={() => handleAdd(f.itemKey)}>
@@ -488,14 +468,19 @@ const Home = () => {
         <InfiniteViewer zoom={zoom} className="infinite-viewer" ref={viewerRef}>
           <div>
             <div className="room" ref={boxRef} id="room" 
-            style={{ width: `${inchToPx(initRoomWidth)}px`, height: `${inchToPx(initRoomHeight)}px`, position: "absolute",
-                     borderWidth: "3px" }}>
+            style={{
+                width: `${inchToPx(roomDimensions.width)}px`, 
+                height: `${inchToPx(roomDimensions.height)}px`, 
+                position: "absolute",
+                borderWidth: "3px" 
+            }}>
               {activeObjects.map((f) => (
                 <img
                   draggable="false"
                   src={f.url}
                   key={f.uid}
                   data-key={f.uid}
+                  id={f.uid}
                   className={`${f.type === "furniture" ? "furn-target" : "struc-target"} ${f.category}`}
                   alt={f.description}
                   onKeyDown={onKeyPressed}
@@ -518,7 +503,7 @@ const Home = () => {
                   dimensionViewable: true,
                 }}
                 ables={[DimensionViewable]}
-                target={(designMode === "furnish") ? furnTargets : strucTargets}
+                target={(designMode === Modes.furnish) ? furnTargets : strucTargets}
                 zoom={1 / zoom}
                 draggable={true}
                 throttleDrag={1}
@@ -550,17 +535,48 @@ const Home = () => {
                 }}
                 onDragEnd={e => {
                   updateFurnitureForm(e);
+
+                  var newX = pxToInch(parseTransform(e.target.style.transform).x);
+                  var newY = pxToInch(parseTransform(e.target.style.transform).y);
+                  var uid = e.target.id;
+
+                  const _activeObjects = [...activeObjects];
+                  var foundIndex = _activeObjects.findIndex(f => f.uid === uid);
+                  _activeObjects[foundIndex].x = newX;
+                  _activeObjects[foundIndex].y = newY;
+
+                  localStorage.activeObjects = JSON.stringify(_activeObjects);
+
+                  // get/set with new
                 }}
                 onRotateEnd={e => {
                   updateFurnitureForm(e);
+
+                  var uid = e.target.id;
+                  var newRotate = parseFloat(parseTransform(e.target.style.transform).rotate);
+
+                  const _activeObjects = [...activeObjects];
+                  var foundIndex = _activeObjects.findIndex(f => f.uid === uid);
+                  _activeObjects[foundIndex].rotate = newRotate;
+                  localStorage.activeObjects = JSON.stringify(_activeObjects);
                 }}
                 onResizeEnd={e => {
                   updateFurnitureForm(e);
+
+                  var uid = e.target.id;
+                  var newHeight = pxToInch(e.target.style.height);
+                  var newWidth = pxToInch(e.target.style.width);
+
+                  const _activeObjects = [...activeObjects];
+                  var foundIndex = _activeObjects.findIndex(f => f.uid === uid);
+                  _activeObjects[foundIndex].width = newWidth;
+                  _activeObjects[foundIndex].height = newHeight;
+                  localStorage.activeObjects = JSON.stringify(_activeObjects);
                 }}
               ></Moveable>
               <Selecto
                 ref={selectoRef}
-                selectableTargets={(designMode === "furnish") ? [".furn-target"] : [".struc-target"]}
+                selectableTargets={(designMode === Modes.furnish) ? [".furn-target"] : [".struc-target"]}
                 dragContainer={".room"}
                 hitRate={0}
                 selectByClick={true}
@@ -569,14 +585,14 @@ const Home = () => {
                 onDragStart={e => {
                   const moveable = moveableRef.current;
                   const target = e.inputEvent.target;
-                  const activeTargets = (designMode === "furnish") ? furnTargets : strucTargets;
+                  const activeTargets = (designMode === Modes.furnish) ? furnTargets : strucTargets;
                   if (moveable.isMoveableElement(target) || activeTargets.some(t => t === target || t.contains(target))) {
                     e.stop();
                   }
                 }}
                 onSelectEnd={e => {
                   const moveable = moveableRef.current;
-                  if (designMode === "furnish")
+                  if (designMode === Modes.furnish)
                     setFurnTargets(e.selected);
                   else
                     setStrucTargets(e.selected);
@@ -598,7 +614,7 @@ const Home = () => {
                 dimensionViewable: true,
               }}
               ables={[DimensionViewable]}
-              target={(((designMode === "room") && !(roomLock)) ? ".room" : ".dummyvalue")}
+              target={(((designMode === Modes.room) && !(roomLock)) ? ".room" : ".dummyvalue")}
               scrollable={true}
               scrollOptions={scrollOptions}
               ref={boxRef}
@@ -611,6 +627,12 @@ const Home = () => {
               }}
               onResizeEnd={e => {
                 updateRoomForm(e);
+
+                var newHeight = pxToInch(e.target.style.height);
+                var newWidth = pxToInch(e.target.style.width);
+
+                var newRoomDimensions = {width: newWidth, height: newHeight};
+                localStorage.roomDimensions = JSON.stringify(newRoomDimensions);
               }}
               onScroll={({ direction }) => {
                 viewerRef.current.scrollBy(
@@ -624,7 +646,7 @@ const Home = () => {
       </div>
       <div className="right-bar">
         {
-          (designMode === "furnish")
+          (designMode === Modes.furnish)
             ?
             <div>
               <div>
@@ -665,7 +687,7 @@ const Home = () => {
               <br />
               <div>Room Dimensions</div>
               <label htmlFor="roomWidth">Lock:</label>
-              <input type="checkbox" checked={roomLock} onChange={(e) => setRoomLock(e.target.checked)} />
+              <input type="checkbox" checked={roomLock} onChange={handleRoomLockChange} />
               <br />
               <br />
               <label htmlFor="roomWidth">Width:</label><br />
@@ -692,9 +714,9 @@ const Home = () => {
             </div>
         }
         <div>
-          <p className="tog">{designMode === "furnish" ? "Floor Plan" : "Furnish"}</p>
+          <p className="tog">{designMode === Modes.furnish ? "Floor Plan" : "Furnish"}</p>
           <label className="switch tog">
-            <input type="checkbox" checked={(designMode === "furnish")} onChange={handleModeChange} />
+            <input type="checkbox" checked={(designMode === Modes.furnish)} onChange={handleModeChange} />
             <span className="slider"></span>
           </label>
         </div>
