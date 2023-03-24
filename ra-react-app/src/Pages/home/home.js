@@ -9,6 +9,50 @@ import furnitureList from "./furnitureData.js";
 import structureList from "./structureData.js"
 
 const apiurl = "http://127.0.0.1:8000/testpost/";
+const inchPixelRatio = 3;
+const initRoomWidth = "168in"
+const initRoomHeight = "144in"
+
+const inchToPx = (inches) => {
+  inches = parseFloat(inches);
+  var pixels = inches*inchPixelRatio;
+  return pixels;
+}
+
+const pxToInch = (pixels) => {
+  pixels = parseFloat(pixels);
+  var inches = pixels/inchPixelRatio;
+  return inches;
+}
+
+const generateUID = () => {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+
+const normalizeRotation = (rotation) => {
+  var nRotation = parseFloat(rotation) % 360;
+  if (nRotation < 0) 
+    nRotation += 360;
+
+  return nRotation;
+}
+
+function round(value, precision) {
+  var multiplier = Math.pow(10, precision || 0);
+  return Math.round(value * multiplier) / multiplier;
+}
+
+const parseTransform = (transformText) => {
+  const rotateRE = new RegExp('rotate\\((.*)\\)');
+  const xRE = new RegExp('translate\\((.*),');
+  const yRE = new RegExp('translate\\(.*, (.*?)\\)');
+
+  const rotate = (transformText.match(rotateRE)) ? transformText.match(rotateRE)[1] : "0deg";
+  const x = (transformText.match(xRE)) ? transformText.match(xRE)[1] : "0px";
+  const y = (transformText.match(yRE)) ? transformText.match(yRE)[1] : "0px";
+
+  return { rotate: rotate, x: x, y: y };
+}
 
 
 const Home = () => {
@@ -19,7 +63,6 @@ const Home = () => {
   const [designMode, setDesignMode] = useState("room");
   const [roomLock, setRoomLock] = useState(false);
   const [zoom, setZoom] = useState(1);
-
 
   const moveableRef = React.useRef(null);
   const selectoRef = React.useRef(null);
@@ -57,15 +100,14 @@ const Home = () => {
   const [requestCallbacksFurniture] = useState(() => {
     function request() {
 
-
       moveableRef.current.request("draggable", {
-        x: parseInt(xInputRef.current.value),
-        y: parseInt(yInputRef.current.value),
+        x: inchToPx(xInputRef.current.value),
+        y: inchToPx(yInputRef.current.value),
       }, true);
 
       moveableRef.current.request("resizable", {
-        offsetWidth: parseInt(widthInputRef.current.value),
-        offsetHeight: parseInt(heightInputRef.current.value),
+        offsetWidth: inchToPx(widthInputRef.current.value),
+        offsetHeight: inchToPx(heightInputRef.current.value),
       }, true);
 
       moveableRef.current.request("rotatable", {
@@ -91,18 +133,14 @@ const Home = () => {
     };
   });
 
-  const handleZoomChange = (newZoom) => {
-    if (newZoom < .1 || newZoom > 10)
-      return;
-    setZoom(newZoom);
-  }
+  
 
   const [requestCallbacksRoom] = useState(() => {
 
     function request() {
       boxRef.current.request("resizable", {
-        offsetWidth: parseInt(roomWidthInputRef.current.value),
-        offsetHeight: parseInt(roomHeightInputRef.current.value),
+        offsetWidth: inchToPx(roomWidthInputRef.current.value),
+        offsetHeight: inchToPx(roomHeightInputRef.current.value),
       }, true);
     }
 
@@ -150,6 +188,12 @@ const Home = () => {
       setFurnTargets([]);
   };
 
+  const handleZoomChange = (newZoom) => {
+    if (newZoom < .1 || newZoom > 10)
+      return;
+    setZoom(newZoom);
+  }
+
   const handleAdd = (itemKey) => {
     const activeList = (designMode === "room" ? structureList : furnitureList);
     const foundItem = activeList.find(f => parseInt(f.itemKey) === parseInt(itemKey));
@@ -161,22 +205,17 @@ const Home = () => {
 
     const roomWidth = document.getElementById("room").style.width;
     const roomHeight = document.getElementById("room").style.height;
-    var newObjX = parseInt((parseInt(roomWidth, 10) / 2) - (parseInt(newActvObj.width, 10) / 2), 10);
-    var newObjY = parseInt((parseInt(roomHeight, 10) / 2) - (parseInt(newActvObj.height, 10) / 2), 10);
+    var newObjX = parseFloat(roomWidth / 2 - newActvObj.width / 2);
+    var newObjY = parseFloat(roomHeight / 2 - newActvObj.height / 2);
 
-    console.log(newObjX);
-    console.log(newObjY);
-
-    newActvObj.rotate = "0deg";
-    newActvObj.x = `${newObjX}px`;
-    newActvObj.y = `${newObjY}px`;
+    newActvObj.rotate = 0;
+    newActvObj.x = newObjX;
+    newActvObj.y = newObjY;
 
     setActiveObjects(oldArray => [...oldArray, newActvObj]);
   }
 
-  const generateUID = () => {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
-  }
+  
 
   const clearFurniture = () => {
     setActiveObjects(activeObjects.filter((f) => f.type !== "furniture"));
@@ -197,67 +236,58 @@ const Home = () => {
     }
   };
 
-  function round(value, precision) {
-    var multiplier = Math.pow(10, precision || 0);
-    return Math.round(value * multiplier) / multiplier;
-  }
+  
 
   const updateFurnitureForm = (e) => {
     requestAnimationFrame(() => {
       const rect = e.moveable.getRect();
-      xInputRef.current.value = `${round(rect.left, 1)}`;
-      yInputRef.current.value = `${round(rect.top, 1)}`;
-      widthInputRef.current.value = `${round(rect.offsetWidth, 1)}`;
-      heightInputRef.current.value = `${round(rect.offsetHeight, 1)}`;
-      rotateInputRef.current.value = `${round(rect.rotation, 1)}`;
+      xInputRef.current.value = `${round(pxToInch(rect.left), 0)}`;
+      yInputRef.current.value = `${round(pxToInch(rect.top), 0)}`;
+      widthInputRef.current.value = `${round(pxToInch(rect.offsetWidth), 0)}`;
+      heightInputRef.current.value = `${round(pxToInch(rect.offsetHeight), 0)}`;
+      rotateInputRef.current.value = `${round(rect.rotation, 0)}`;
     })
   };
 
   const updateRoomForm = (e) => {
     requestAnimationFrame(() => {
       const rect = e.moveable.getRect();
-      roomWidthInputRef.current.value = `${round(rect.offsetWidth, 1)}`;
-      roomHeightInputRef.current.value = `${round(rect.offsetHeight, 1)}`;
+      roomWidthInputRef.current.value = `${round(pxToInch(rect.offsetWidth), 0)}`;
+      roomHeightInputRef.current.value = `${round(pxToInch(rect.offsetHeight), 0)}`;
     })
   };
 
 
 
-  const parseTransform = (transformText) => {
-    const rotateRE = new RegExp('rotate\\((.*)\\)');
-    const xRE = new RegExp('translate\\((.*),');
-    const yRE = new RegExp('translate\\(.*, (.*?)\\)');
-
-    const rotate = (transformText.match(rotateRE)) ? transformText.match(rotateRE)[1] : "0deg";
-    const x = (transformText.match(xRE)) ? transformText.match(xRE)[1] : "0px";
-    const y = (transformText.match(yRE)) ? transformText.match(yRE)[1] : "0px";
-
-    return { rotate: rotate, x: x, y: y };
-  }
+  
 
   const exportData = () => {
-    const _activeObjects = activeObjects.map(a => a);
+    const _activeObjects = [...activeObjects];
     const child = document.getElementById("room").childNodes;
     child.forEach((c) => {
       if (c.classList.contains("furn-target") || c.classList.contains("struc-target")) {
-
+        // get values from html element
         const uid = c.getAttribute("data-key");
         const w = c.style.width;
         const h = c.style.height;
         const t = parseTransform(c.style.transform);
 
+        // find corresponding item in activeObjects
         const foundItem = _activeObjects.find(f => f.uid === uid);
-        foundItem.width = w;
-        foundItem.height = h;
-        foundItem.x = t.x;
-        foundItem.y = t.y;
-        foundItem.rotate = t.rotate;
+        foundItem.width = round(pxToInch(w), 3);
+        foundItem.height = round(pxToInch(h), 3);
+        foundItem.x = round(pxToInch(t.x), 3);
+        foundItem.y = round(pxToInch(t.y), 3);
+        foundItem.rotate = normalizeRotation(t.rotate);
       }
     })
 
 
-    const roomWidth = document.getElementById("room").style.width;
-    const roomHeight = document.getElementById("room").style.height;
+    var roomWidth = document.getElementById("room").style.width;
+    var roomHeight = document.getElementById("room").style.height;
+
+    roomWidth = round(pxToInch(roomWidth), 3);
+    roomHeight = round(pxToInch(roomHeight), 3);
 
 
     const jsonObj = {};
@@ -344,7 +374,7 @@ const Home = () => {
         willChange: "transform",
         transform: `translate(-50%, 0px)`,
       }}>
-        {Math.round(rect.offsetWidth)} x {Math.round(rect.offsetHeight)}
+        {Math.round(pxToInch(rect.offsetWidth))}" x {Math.round(pxToInch(rect.offsetHeight))}"
       </div>;
     },
   };
@@ -368,10 +398,6 @@ const Home = () => {
       document.getElementsByClassName("room")[0].style.borderWidth,
       10
     );
-
-    console.log(ivWidth, ivHeight);
-    console.log(rWidth, rHeight);
-    console.log(borderWidth);
 
     rWidth += 2 * borderWidth;
     rHeight += 2 * borderWidth;
@@ -462,7 +488,7 @@ const Home = () => {
         <InfiniteViewer zoom={zoom} className="infinite-viewer" ref={viewerRef}>
           <div>
             <div className="room" ref={boxRef} id="room" 
-            style={{ width: "400px", height: "400px", position: "absolute",
+            style={{ width: `${inchToPx(initRoomWidth)}px`, height: `${inchToPx(initRoomHeight)}px`, position: "absolute",
                      borderWidth: "3px" }}>
               {activeObjects.map((f) => (
                 <img
@@ -478,9 +504,9 @@ const Home = () => {
                     draggable: false,
                     position: "absolute",
                     zIndex: `${f.z}`,
-                    width: `${f.width}`,
-                    height: `${f.height}`,
-                    transform: `translate(${f.x}, ${f.y})`
+                    width: `${inchToPx(f.width)}px`,
+                    height: `${inchToPx(f.height)}px`,
+                    transform: `translate(${inchToPx(f.x)}px, ${inchToPx(f.y)}px) rotate(${f.rotate}deg)`
                   }}
                 />
               ))}
@@ -508,8 +534,6 @@ const Home = () => {
                     direction[1] * 10
                   );
                 }}
-
-
                 onDragStart={e => {
                   e.target.focus();
                 }}
