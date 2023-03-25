@@ -5,6 +5,9 @@ body,
     margin: 0;
     background-color: #f2f3f5;
     overflow-x: hidden; /* Temporary cover-up for some issue in navbar.scss*/
+    -webkit-user-select: none;
+    -ms-user-select: none; 
+    user-select: none; 
 }
 
 .App {

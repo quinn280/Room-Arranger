@@ -21,7 +21,7 @@ const structureData = [
       itemKey: 52,
       url: "vectors/structural/window.png",
       defaultWidth: 4,
-      defaultHeight: 20,
+      defaultHeight: 40,
       description: "Window",
       category: "window",
       type: "structural"

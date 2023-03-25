@@ -564,7 +564,7 @@ const Home = () => {
                 throttleDrag={1}
                 throttleRotate={5}
                 resizable={true}
-                renderDirections={["nw", "n", "ne", "w", "e", "sw", "s", "se"]}
+                renderDirections={(designMode === Modes.furnish) ? ["nw", "n", "ne", "w", "e", "sw", "s", "se"] : ["n", "w", "s", "e"]}
                 rotatable={true}
                 scrollable={true}
                 scrollOptions={scrollOptions}
