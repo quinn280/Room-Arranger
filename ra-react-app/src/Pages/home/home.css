@@ -259,6 +259,10 @@ input:checked+.slider:before {
   visibility: hidden;
 }
 
+.active-drag .moveable-line.moveable-rotation-line {
+  visibility: hidden;
+}
+
 .active-drag .moveable-line {
   visibility: hidden;
 }

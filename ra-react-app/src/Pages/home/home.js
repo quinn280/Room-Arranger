@@ -10,11 +10,20 @@ import structureList from "./structureData.js"
 
 const apiurl = "http://127.0.0.1:8000/testpost/";
 const inchPixelRatio = 3;
+const wallWidth = 1;
 const defaultRoomDimensions = {
   width: "168in",
   height: "144in"
 }
 const Modes = Object.freeze({ room: "room", furnish: "furnish" }) // modes enum
+
+function compareByUid(a,b) {
+  if (a.uid < b.uid)
+     return -1;
+  if (a.uid > b.uid)
+    return 1;
+  return 0;
+}
 
 const inchToPx = (inches) => {
   inches = parseFloat(inches);
@@ -24,7 +33,7 @@ const inchToPx = (inches) => {
 
 const pxToInch = (pixels) => {
   pixels = parseFloat(pixels);
-  var inches = pixels / inchPixelRatio;
+  var inches = parseFloat(pixels / inchPixelRatio);
   return inches;
 }
 
@@ -84,6 +93,7 @@ const Home = () => {
   const roomHeightInputRef = useRef(null);
 
   React.useEffect(() => {
+    window.addEventListener('resize', zoomFit)
     initScrollOptions();
     zoomFit();
     if (designMode === Modes.room) updateRoomForm();
@@ -144,8 +154,8 @@ const Home = () => {
 
     function request() {
       boxRef.current.request("resizable", {
-        offsetWidth: inchToPx(roomWidthInputRef.current.value),
-        offsetHeight: inchToPx(roomHeightInputRef.current.value),
+        offsetWidth: inchToPx(roomWidthInputRef.current.value) + inchToPx(2*wallWidth),
+        offsetHeight: inchToPx(roomHeightInputRef.current.value) + inchToPx(2*wallWidth),
       }, true);
     }
 
@@ -169,30 +179,22 @@ const Home = () => {
   });
 
 
-  const handleRemove = (uid) => {
-    const foundItem = activeObjects.find(f => f.uid === uid);
-    const z = foundItem.z
+  const handleRemove = (uidArray) => {   
+    var _activeObjects = activeObjects.filter(f => !uidArray.includes(f.uid));
 
-    if (designMode === Modes.furnish && foundItem.type === "structural")
-      return;
-    if (designMode === Modes.room && foundItem.type === "furniture")
-      return;
-
-    var _activeObjects = activeObjects.map(f => {
-      if (f.z > z) {
-        f.z -= 1;
-      }
-
-      return f;
-    })
-    _activeObjects = _activeObjects.filter((f) => f.uid !== uid)
+    _activeObjects.sort(compareByUid);
+    _activeObjects.forEach((o, i) => {o.z = i+1;})
 
     setActiveObjects(() => _activeObjects);
     localStorage.activeObjects = JSON.stringify(_activeObjects);
-
     setTargets([]);
     clearObjectForm();
   };
+
+  const removeActiveTargets = () => {
+    const uidArray = targets.map(t => t.id);
+    handleRemove(uidArray);
+  } 
 
   const handleZoomChange = (newZoom) => {
     if (newZoom < .1 || newZoom > 10)
@@ -226,11 +228,11 @@ const Home = () => {
       const elem = document.getElementById(newActvObj.uid);
       setTargets([elem]);
 
-      xInputRef.current.value = `${round(newActvObj.x, 0)}`;
-      yInputRef.current.value = `${round(newActvObj.y, 0)}`;
-      widthInputRef.current.value = `${round(newActvObj.width, 0)}`;
-      heightInputRef.current.value = `${round(newActvObj.height, 0)}`;
-      rotateInputRef.current.value = `${round(newActvObj.rotate, 0)}`;
+      xInputRef.current.value = `${round(newActvObj.x, 1)}`;
+      yInputRef.current.value = `${round(newActvObj.y, 1)}`;
+      widthInputRef.current.value = `${round(newActvObj.width, 1)}`;
+      heightInputRef.current.value = `${round(newActvObj.height, 1)}`;
+      rotateInputRef.current.value = `${round(newActvObj.rotate, 1)}`;
     }, 0);
   }
 
@@ -262,22 +264,20 @@ const Home = () => {
   }
 
   const onKeyPressed = (e) => {
-    console.log('pressed')
     const keyCode = e.keyCode;
-    const dataKey = e.target.getAttribute("data-key");
 
     if (keyCode === 8 || keyCode === 46) {
-      handleRemove(dataKey);
+      removeActiveTargets()
     }
   };
 
   const updateFurnitureForm = (e) => {
     requestAnimationFrame(() => {
       const rect = e.moveable.getRect();
-      xInputRef.current.value = `${round(pxToInch(rect.left), 0)}`;
-      yInputRef.current.value = `${round(pxToInch(rect.top), 0)}`;
-      widthInputRef.current.value = `${round(pxToInch(rect.offsetWidth), 0)}`;
-      heightInputRef.current.value = `${round(pxToInch(rect.offsetHeight), 0)}`;
+      xInputRef.current.value = `${round(pxToInch(rect.left), 1)}`;
+      yInputRef.current.value = `${round(pxToInch(rect.top), 1)}`;
+      widthInputRef.current.value = `${round(pxToInch(rect.offsetWidth), 1)}`;
+      heightInputRef.current.value = `${round(pxToInch(rect.offsetHeight), 1)}`;
       rotateInputRef.current.value = `${round(rect.rotation, 0)}`;
     })
   };
@@ -285,8 +285,8 @@ const Home = () => {
   const updateRoomFormResizeEnd = (e) => {
     requestAnimationFrame(() => {
       const rect = e.moveable.getRect();
-      roomWidthInputRef.current.value = `${round(pxToInch(rect.offsetWidth), 0)}`;
-      roomHeightInputRef.current.value = `${round(pxToInch(rect.offsetHeight), 0)}`;
+      roomWidthInputRef.current.value = `${round(pxToInch(rect.offsetWidth) - wallWidth*2, 0)}`;
+      roomHeightInputRef.current.value = `${round(pxToInch(rect.offsetHeight) - wallWidth*2, 0)}`;
     })
   };
 
@@ -300,8 +300,8 @@ const Home = () => {
 
   const exportData = () => {
     const jsonObj = {};
-    jsonObj.roomDimensions = roomDimensions;
-    jsonObj.activeObjects = activeObjects;
+    jsonObj.roomDimensions = (localStorage.roomDimensions) ? JSON.parse(localStorage.roomDimensions) : roomDimensions;
+    jsonObj.activeObjects = (localStorage.activeObjects) ? JSON.parse(localStorage.activeObjects) : activeObjects;
     const jsonStr = JSON.stringify(jsonObj, undefined, 4);
 
     console.log("posted: ")
@@ -385,6 +385,32 @@ const Home = () => {
         transform: `translate(-50%, 0px)`,
       }}>
         {Math.round(pxToInch(rect.offsetWidth))}" x {Math.round(pxToInch(rect.offsetHeight))}"
+      </div>;
+    },
+  };
+
+  const DimensionViewableRoom = {
+    name: "dimensionViewable",
+    props: {},
+    events: {},
+    render(moveable, React) {
+      const rect = moveable.getRect();
+
+      return <div key={"dimension-viewer"} className={"moveable-dimension"} style={{
+        position: "absolute",
+        left: `${rect.width / 2}px`,
+        top: `${rect.height + 20*(1/zoom)}px`,
+        background: "#4af",
+        borderRadius: "2px",
+        padding: `${2}px ${4}px`,
+        color: "white",
+        fontSize: `${13 * 1 / zoom}px`,
+        whiteSpace: "nowrap",
+        fontWeight: "bold",
+        willChange: "transform",
+        transform: `translate(-50%, 0px)`,
+      }}>
+        {Math.round(pxToInch(rect.offsetWidth) - 2*wallWidth)}" x {Math.round(pxToInch(rect.offsetHeight) - 2*wallWidth)}"
       </div>;
     },
   };
@@ -478,12 +504,6 @@ const Home = () => {
     localStorage.activeObjects = JSON.stringify(_activeObjects);
   }
 
-  const debugStuff = (e) => {
-    const roomElem = document.getElementsByClassName("room")[0];
-    roomWidthInputRef.current.value = `${round(pxToInch(roomElem.style.width), 0)}`;
-    roomHeightInputRef.current.value = `${round(pxToInch(roomElem.style.height), 0)}`;
-  }
-
   const clearObjectForm = () => {
     xInputRef.current.value = '';
     yInputRef.current.value = '';
@@ -492,6 +512,7 @@ const Home = () => {
     rotateInputRef.current.value = '';
   }
 
+  
   return (
     <div className="home-page">
       <div className="left-bar">
@@ -527,7 +548,7 @@ const Home = () => {
                 width: `${inchToPx(roomDimensions.width)}px`,
                 height: `${inchToPx(roomDimensions.height)}px`,
                 position: "absolute",
-                borderWidth: "3px"
+                borderWidth: `${inchToPx(wallWidth)}px`
               }}>
               {activeObjects.map((f) => (
                 <img
@@ -584,7 +605,6 @@ const Home = () => {
                 }}
                 onDragGroupStart={e => {
                   e.target.focus();
-                  console.log(targets.length);
                 }}
                 onDragEnd={e => {
                   const controlBox = e.moveable.controlBox.element;
@@ -610,6 +630,7 @@ const Home = () => {
                 }}
                 onRenderEnd={e => {
                   updateAOStorage(e);
+                  updateFurnitureForm(e);
                 }}
                 onRenderGroupEnd={({ events }) => {
                   events.forEach(ev => {
@@ -659,23 +680,25 @@ const Home = () => {
               props={{
                 dimensionViewable: true,
               }}
-              ables={[DimensionViewable]}
+              ables={[DimensionViewableRoom]}
               target={(((designMode === Modes.room) && !(roomLock)) ? ".room" : ".dummyvalue")}
               scrollable={true}
               scrollOptions={scrollOptions}
               ref={boxRef}
+              throttleResize={inchPixelRatio}
               resizable={true}
               zoom={1 / zoom}
               onResize={(e) => {
                 e.target.style.width = `${e.width}px`;
                 e.target.style.height = `${e.height}px`;
                 e.target.style.transform = e.drag.transform;
+                updateRoomFormResizeEnd(e);
               }}
               onResizeEnd={e => {
                 updateRoomFormResizeEnd(e);
 
-                var newHeight = pxToInch(e.target.style.height);
-                var newWidth = pxToInch(e.target.style.width);
+                var newHeight = round(pxToInch(e.target.style.height), 0);
+                var newWidth = round(pxToInch(e.target.style.width), 0);
 
                 var newRoomDimensions = { width: newWidth, height: newHeight };
                 localStorage.roomDimensions = JSON.stringify(newRoomDimensions);
@@ -699,14 +722,12 @@ const Home = () => {
                 <button onClick={(e) => { e.preventDefault(); handleZoomChange(zoom + .1); }}>Zoom In</button>
                 <button onClick={(e) => { e.preventDefault(); handleZoomChange(zoom - .1); }}>Zoom Out</button>
                 <button onClick={(e) => { e.preventDefault(); zoomFit(); }}>Zoom Fit</button>
-                <button onClick={(e) => { debugStuff() }}>Debug</button>
               </div>
-              <br />
               <br />
               <div>Object Dimensions</div>
               <br />
               <label htmlFor="xyz">X:</label><br />
-              <input ref={xInputRef} {...requestCallbacksFurniture} type="number" id="x" name="x" disabled={targets.length === 0} /><br />
+              <input ref={xInputRef} {...requestCallbacksFurniture} type="number" id="x" name="x" disabled={targets.length !== 1} /><br />
               <label htmlFor="y">Y:</label><br />
               <input ref={yInputRef} {...requestCallbacksFurniture} type="number" id="y" name="y" disabled={targets.length !== 1} /><br />
               <label htmlFor="width">Width</label><br />
@@ -715,13 +736,14 @@ const Home = () => {
               <input ref={heightInputRef} {...requestCallbacksFurniture} type="number" id="height" name="height" disabled={targets.length !== 1} /><br />
               <label htmlFor="rotation">Rotation:</label><br />
               <input ref={rotateInputRef} {...requestCallbacksFurniture} type="number" id="rotation" name="rotation" disabled={targets.length !== 1} /><br />
+              <br />
+              <button onClick={removeActiveTargets} disabled={targets.length === 0}>Delete</button> 
+              <br />
+              <button onClick={bringFront} disabled={targets.length === 0}>Bring Front</button>
+              <button onClick={sendBack} disabled={targets.length === 0}>Send Back</button>
               <br /><br />
-              <button onClick={clearFurniture}>Clear</button>
-              <br /><br />
-              <button onClick={bringFront}>Bring Front</button>
-              <button onClick={sendBack}>Send Back</button>
-              <br /><br />
-              <button onClick={exportData}>Dev: Send Furn Data to Back End</button>
+              <button onClick={clearFurniture}>Delete All</button><br />
+              <button onClick={exportData}>Dev: API Post</button>
             </div>
             :
             <div className="roomFormEntry" key="roomFormEntry">
@@ -729,9 +751,7 @@ const Home = () => {
                 <button onClick={(e) => { e.preventDefault(); handleZoomChange(zoom + .1); }}>Zoom In</button>
                 <button onClick={(e) => { e.preventDefault(); handleZoomChange(zoom - .1); }}>Zoom Out</button>
                 <button onClick={(e) => { e.preventDefault(); zoomFit(); }}>Zoom Fit</button>
-                <button onClick={(e) => { debugStuff() }}>Debug</button>
               </div>
-              <br />
               <br />
               <div>Room Dimensions</div>
               <label htmlFor="roomWidth">Lock:</label>
@@ -758,7 +778,9 @@ const Home = () => {
               <label htmlFor="rotation">Rotation:</label><br />
               <input ref={rotateInputRef} {...requestCallbacksFurniture} type="number" id="rotation" name="rotation" disabled={targets.length !== 1} /><br />
               <br /><br />
-
+              <button onClick={removeActiveTargets} disabled={targets.length === 0}>Delete</button>
+              <br/><br/>
+              <button onClick={exportData}>Dev: API Post</button>
             </div>
         }
         <div>
