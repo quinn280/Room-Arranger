@@ -677,9 +677,9 @@ const Home = () => {
               <br />
               <br />
               <label htmlFor="roomWidth">Width:</label><br />
-              <input value={roomDimensions.width} readOnly={roomLock} ref={roomWidthInputRef} {...requestCallbacksRoom} type="number" id="roomWidth" name="roomWidth" /><br />
+              <input readOnly={roomLock} ref={roomWidthInputRef} {...requestCallbacksRoom} type="number" id="roomWidth" name="roomWidth" /><br />
               <label htmlFor="roomHeight">Height:</label><br />
-              <input value={roomDimensions.height} readOnly={roomLock} ref={roomHeightInputRef} {...requestCallbacksRoom} type="number" id="roomHeight" name="roomHeight" /><br />
+              <input readOnly={roomLock} ref={roomHeightInputRef} {...requestCallbacksRoom} type="number" id="roomHeight" name="roomHeight" /><br />
               <br />
 
               <div>Object Dimensions</div>
