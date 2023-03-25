@@ -240,6 +240,8 @@ const Home = () => {
     const checked = e.target.checked;
     const newMode = (checked ? Modes.furnish : Modes.room)
     setDesignMode(newMode);
+    setFurnTargets([]);
+    setStrucTargets([]);
     localStorage.designMode = newMode;
   };
 
@@ -437,6 +439,26 @@ const Home = () => {
     boxRef.current.updateRect();
   };
 
+  const updateAOStorage = (e) => {
+    var newX = pxToInch(parseTransform(e.target.style.transform).x);
+    var newY = pxToInch(parseTransform(e.target.style.transform).y);
+    var newHeight = pxToInch(e.target.style.height);
+    var newWidth = pxToInch(e.target.style.width);
+    var newRotate = normalizeRotation(parseFloat(parseTransform(e.target.style.transform).rotate));
+
+    var uid = e.target.id;
+    const _activeObjects = [...activeObjects];
+    var foundItem = _activeObjects.find(f => f.uid === uid);
+
+    foundItem.x = newX;
+    foundItem.y = newY;
+    foundItem.height = newHeight;
+    foundItem.width = newWidth;
+    foundItem.rotate = newRotate;
+
+    localStorage.activeObjects = JSON.stringify(_activeObjects); 
+  }
+
   return (
     <div className="home-page">
       <div className="left-bar">
@@ -533,45 +555,9 @@ const Home = () => {
                   e.target.style.height = `${e.height}px`;
                   e.target.style.transform = e.drag.transform;
                 }}
-                onDragEnd={e => {
+                onRenderEnd={e => {
                   updateFurnitureForm(e);
-
-                  var newX = pxToInch(parseTransform(e.target.style.transform).x);
-                  var newY = pxToInch(parseTransform(e.target.style.transform).y);
-                  var uid = e.target.id;
-
-                  const _activeObjects = [...activeObjects];
-                  var foundIndex = _activeObjects.findIndex(f => f.uid === uid);
-                  _activeObjects[foundIndex].x = newX;
-                  _activeObjects[foundIndex].y = newY;
-
-                  localStorage.activeObjects = JSON.stringify(_activeObjects);
-
-                  // get/set with new
-                }}
-                onRotateEnd={e => {
-                  updateFurnitureForm(e);
-
-                  var uid = e.target.id;
-                  var newRotate = parseFloat(parseTransform(e.target.style.transform).rotate);
-
-                  const _activeObjects = [...activeObjects];
-                  var foundIndex = _activeObjects.findIndex(f => f.uid === uid);
-                  _activeObjects[foundIndex].rotate = newRotate;
-                  localStorage.activeObjects = JSON.stringify(_activeObjects);
-                }}
-                onResizeEnd={e => {
-                  updateFurnitureForm(e);
-
-                  var uid = e.target.id;
-                  var newHeight = pxToInch(e.target.style.height);
-                  var newWidth = pxToInch(e.target.style.width);
-
-                  const _activeObjects = [...activeObjects];
-                  var foundIndex = _activeObjects.findIndex(f => f.uid === uid);
-                  _activeObjects[foundIndex].width = newWidth;
-                  _activeObjects[foundIndex].height = newHeight;
-                  localStorage.activeObjects = JSON.stringify(_activeObjects);
+                  updateAOStorage(e);
                 }}
               ></Moveable>
               <Selecto
@@ -691,9 +677,9 @@ const Home = () => {
               <br />
               <br />
               <label htmlFor="roomWidth">Width:</label><br />
-              <input readOnly={roomLock} ref={roomWidthInputRef} {...requestCallbacksRoom} type="number" id="roomWidth" name="roomWidth" /><br />
+              <input value={roomDimensions.width} readOnly={roomLock} ref={roomWidthInputRef} {...requestCallbacksRoom} type="number" id="roomWidth" name="roomWidth" /><br />
               <label htmlFor="roomHeight">Height:</label><br />
-              <input readOnly={roomLock} ref={roomHeightInputRef} {...requestCallbacksRoom} type="number" id="roomHeight" name="roomHeight" /><br />
+              <input value={roomDimensions.height} readOnly={roomLock} ref={roomHeightInputRef} {...requestCallbacksRoom} type="number" id="roomHeight" name="roomHeight" /><br />
               <br />
 
               <div>Object Dimensions</div>
