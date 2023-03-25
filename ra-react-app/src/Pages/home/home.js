@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Moveable from "react-moveable";
 import Selecto from "react-selecto";
 import InfiniteViewer from "react-infinite-viewer";
@@ -63,31 +63,31 @@ const parseTransform = (transformText) => {
 const Home = () => {
   const [activeObjects, setActiveObjects] = useState((localStorage.activeObjects) ? JSON.parse(localStorage.activeObjects) : []);
   const [roomDimensions] = useState((localStorage.roomDimensions) ? JSON.parse(localStorage.roomDimensions) : defaultRoomDimensions)
-  const [strucTargets, setStrucTargets] = useState([]);
-  const [scrollOptions, setScrollOptions] = useState({});
-  const [furnTargets, setFurnTargets] = useState([]);
-
   const [designMode, setDesignMode] = useState(localStorage.designMode || Modes.room);
   const [roomLock, setRoomLock] = useState((localStorage.roomLock) ? JSON.parse(localStorage.roomLock) : false);
+
   const [zoom, setZoom] = useState(1);
+  const [targets, setTargets] = useState([]);
+  const [scrollOptions, setScrollOptions] = useState({});
 
-  const moveableRef = React.useRef(null);
-  const selectoRef = React.useRef(null);
-  const boxRef = React.useRef(null);
-  const viewerRef = React.useRef(null);
+  const moveableRef = useRef(null);
+  const selectoRef = useRef(null);
+  const boxRef = useRef(null);
+  const viewerRef = useRef(null);
 
-  const xInputRef = React.useRef(null);
-  const yInputRef = React.useRef(null);
-  const widthInputRef = React.useRef(null);
-  const heightInputRef = React.useRef(null);
-  const rotateInputRef = React.useRef(null);
-
-  const roomWidthInputRef = React.useRef(null);
-  const roomHeightInputRef = React.useRef(null);
+  const xInputRef = useRef(null);
+  const yInputRef = useRef(null);
+  const widthInputRef = useRef(null);
+  const heightInputRef = useRef(null);
+  const rotateInputRef = useRef(null);
+  const roomWidthInputRef = useRef(null);
+  const roomHeightInputRef = useRef(null);
 
   React.useEffect(() => {
     initScrollOptions();
     zoomFit();
+    if (designMode === Modes.room) updateRoomForm();
+    
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const initScrollOptions = () => {
@@ -140,8 +140,6 @@ const Home = () => {
     };
   });
 
-  
-
   const [requestCallbacksRoom] = useState(() => {
 
     function request() {
@@ -192,10 +190,8 @@ const Home = () => {
     setActiveObjects(() => _activeObjects);
     localStorage.activeObjects = JSON.stringify(_activeObjects);
 
-    if (designMode === Modes.room)
-      setStrucTargets([]);
-    else
-      setFurnTargets([]);
+    setTargets([]);
+    clearObjectForm();
   };
 
   const handleZoomChange = (newZoom) => {
@@ -218,31 +214,46 @@ const Home = () => {
 
     const roomWidth = pxToInch(document.getElementById("room").style.width);
     const roomHeight = pxToInch(document.getElementById("room").style.height);
-    var newObjX = roomWidth / 2 - newActvObj.width / 2; // initialize in center
-    var newObjY = roomHeight / 2 - newActvObj.height / 2;
-    newActvObj.x = newObjX;
-    newActvObj.y = newObjY;
+    newActvObj.x = roomWidth / 2 - newActvObj.width / 2;
+    newActvObj.y = roomHeight / 2 - newActvObj.height / 2;
 
     const _activeObjects = [...activeObjects, newActvObj];
     localStorage.activeObjects = JSON.stringify(_activeObjects);
     setActiveObjects(() => _activeObjects);
+
+    // schedule async callback
+    setTimeout(() => {
+      const elem = document.getElementById(newActvObj.uid);
+      setTargets([elem]);
+
+      xInputRef.current.value = `${round(newActvObj.x, 0)}`;
+      yInputRef.current.value = `${round(newActvObj.y, 0)}`;
+      widthInputRef.current.value = `${round(newActvObj.width, 0)}`;
+      heightInputRef.current.value = `${round(newActvObj.height, 0)}`;
+      rotateInputRef.current.value = `${round(newActvObj.rotate, 0)}`;
+    }, 0);
   }
 
   const clearFurniture = () => {
     const _activeObjects = activeObjects.filter((f) => f.type !== "furniture");
     
-    setFurnTargets([]);
+    setTargets([]);
     localStorage.activeObjects = JSON.stringify(_activeObjects);
     setActiveObjects(() => _activeObjects);
+    clearObjectForm();
   }
 
   const handleModeChange = (e) => {
     const checked = e.target.checked;
     const newMode = (checked ? Modes.furnish : Modes.room)
     setDesignMode(newMode);
-    setFurnTargets([]);
-    setStrucTargets([]);
+    setTargets([]);
     localStorage.designMode = newMode;
+
+    if (newMode === Modes.room)
+    {
+      updateRoomForm();
+    }
   };
 
   const handleRoomLockChange = (e) => {
@@ -271,12 +282,20 @@ const Home = () => {
     })
   };
 
-  const updateRoomForm = (e) => {
+  const updateRoomFormResizeEnd = (e) => {
     requestAnimationFrame(() => {
       const rect = e.moveable.getRect();
       roomWidthInputRef.current.value = `${round(pxToInch(rect.offsetWidth), 0)}`;
       roomHeightInputRef.current.value = `${round(pxToInch(rect.offsetHeight), 0)}`;
     })
+  };
+
+  const updateRoomForm = () => {
+    setTimeout(() => {
+      const roomElem = document.getElementsByClassName("room")[0];
+      roomWidthInputRef.current.value = `${round(pxToInch(roomElem.style.width), 0)}`;
+      roomHeightInputRef.current.value = `${round(pxToInch(roomElem.style.height), 0)}`;
+    }, 10);
   };
 
   const exportData = () => {
@@ -459,6 +478,20 @@ const Home = () => {
     localStorage.activeObjects = JSON.stringify(_activeObjects); 
   }
 
+  const debugStuff = (e) => {
+    const roomElem = document.getElementsByClassName("room")[0];
+    roomWidthInputRef.current.value = `${round(pxToInch(roomElem.style.width), 0)}`;
+    roomHeightInputRef.current.value = `${round(pxToInch(roomElem.style.height), 0)}`;
+  }
+
+  const clearObjectForm = () => {
+    xInputRef.current.value = '';
+    yInputRef.current.value = '';
+    widthInputRef.current.value = '';
+    heightInputRef.current.value = '';
+    rotateInputRef.current.value = '';
+  }
+
   return (
     <div className="home-page">
       <div className="left-bar">
@@ -525,7 +558,7 @@ const Home = () => {
                   dimensionViewable: true,
                 }}
                 ables={[DimensionViewable]}
-                target={(designMode === Modes.furnish) ? furnTargets : strucTargets}
+                target={targets}
                 zoom={1 / zoom}
                 draggable={true}
                 throttleDrag={1}
@@ -571,24 +604,23 @@ const Home = () => {
                 onDragStart={e => {
                   const moveable = moveableRef.current;
                   const target = e.inputEvent.target;
-                  const activeTargets = (designMode === Modes.furnish) ? furnTargets : strucTargets;
-                  if (moveable.isMoveableElement(target) || activeTargets.some(t => t === target || t.contains(target))) {
+                  if (moveable.isMoveableElement(target) || targets.some(t => t === target || t.contains(target))) {
                     e.stop();
                   }
                 }}
                 onSelectEnd={e => {
                   const moveable = moveableRef.current;
-                  if (designMode === Modes.furnish)
-                    setFurnTargets(e.selected);
-                  else
-                    setStrucTargets(e.selected);
-
+                  setTargets(e.selected);
+                  
                   if (e.isDragStart) {
                     e.inputEvent.preventDefault();
-
+                    
                     setTimeout(() => {
                       moveable.dragStart(e.inputEvent);
                     });
+                  }
+                  else {
+                    clearObjectForm();
                   }
                 }}
               ></Selecto>
@@ -612,7 +644,7 @@ const Home = () => {
                 e.target.style.transform = e.drag.transform;
               }}
               onResizeEnd={e => {
-                updateRoomForm(e);
+                updateRoomFormResizeEnd(e);
 
                 var newHeight = pxToInch(e.target.style.height);
                 var newWidth = pxToInch(e.target.style.width);
@@ -639,21 +671,22 @@ const Home = () => {
                 <button onClick={(e) => { e.preventDefault(); handleZoomChange(zoom + .1); }}>Zoom In</button>
                 <button onClick={(e) => { e.preventDefault(); handleZoomChange(zoom - .1); }}>Zoom Out</button>
                 <button onClick={(e) => {e.preventDefault(); zoomFit();}}>Zoom Fit</button>
+                <button onClick={(e) => {debugStuff()}}>Debug</button>
               </div>
               <br />
               <br />
               <div>Object Dimensions</div>
               <br />
               <label htmlFor="xyz">X:</label><br />
-              <input ref={xInputRef} {...requestCallbacksFurniture} type="number" id="x" name="x" /><br />
+              <input ref={xInputRef} {...requestCallbacksFurniture} type="number" id="x" name="x" disabled={targets.length === 0}/><br />
               <label htmlFor="y">Y:</label><br />
-              <input ref={yInputRef} {...requestCallbacksFurniture} type="number" id="y" name="y" /><br />
+              <input ref={yInputRef} {...requestCallbacksFurniture} type="number" id="y" name="y" disabled={targets.length === 0}/><br />
               <label htmlFor="width">Width</label><br />
-              <input ref={widthInputRef} {...requestCallbacksFurniture} type="number" id="width" name="width" /><br />
+              <input ref={widthInputRef} {...requestCallbacksFurniture} type="number" id="width" name="width" disabled={targets.length === 0}/><br />
               <label htmlFor="height">Height</label><br />
-              <input ref={heightInputRef} {...requestCallbacksFurniture} type="number" id="height" name="height" /><br />
+              <input ref={heightInputRef} {...requestCallbacksFurniture} type="number" id="height" name="height" disabled={targets.length === 0}/><br />
               <label htmlFor="rotation">Rotation:</label><br />
-              <input ref={rotateInputRef} {...requestCallbacksFurniture} type="number" id="rotation" name="rotation" /><br />
+              <input ref={rotateInputRef} {...requestCallbacksFurniture} type="number" id="rotation" name="rotation" disabled={targets.length === 0}/><br />
               <br /><br />
               <button onClick={clearFurniture}>Clear</button>
               <br /><br />
@@ -668,6 +701,7 @@ const Home = () => {
                 <button onClick={(e) => { e.preventDefault(); handleZoomChange(zoom + .1); }}>Zoom In</button>
                 <button onClick={(e) => { e.preventDefault(); handleZoomChange(zoom - .1); }}>Zoom Out</button>
                 <button onClick={(e) => {e.preventDefault(); zoomFit();}}>Zoom Fit</button>
+                <button onClick={(e) => {debugStuff()}}>Debug</button>
               </div>
               <br />
               <br />
@@ -686,15 +720,15 @@ const Home = () => {
               <br />
 
               <label htmlFor="x">X:</label><br />
-              <input ref={xInputRef} {...requestCallbacksFurniture} type="number" id="x" name="x" /><br />
+              <input ref={xInputRef} {...requestCallbacksFurniture} type="number" id="x" name="x" disabled={targets.length === 0}/><br />
               <label htmlFor="y">Y:</label><br />
-              <input ref={yInputRef} {...requestCallbacksFurniture} type="number" id="y" name="y" /><br />
+              <input ref={yInputRef} {...requestCallbacksFurniture} type="number" id="y" name="y" disabled={targets.length === 0}/><br />
               <label htmlFor="width">Width</label><br />
-              <input ref={widthInputRef} {...requestCallbacksFurniture} type="number" id="width" name="width" /><br />
+              <input ref={widthInputRef} {...requestCallbacksFurniture} type="number" id="width" name="width" disabled={targets.length === 0}/><br />
               <label htmlFor="height">Height</label><br />
-              <input ref={heightInputRef} {...requestCallbacksFurniture} type="number" id="height" name="height" /><br />
+              <input ref={heightInputRef} {...requestCallbacksFurniture} type="number" id="height" name="height" disabled={targets.length === 0}/><br />
               <label htmlFor="rotation">Rotation:</label><br />
-              <input ref={rotateInputRef} {...requestCallbacksFurniture} type="number" id="rotation" name="rotation" /><br />
+              <input ref={rotateInputRef} {...requestCallbacksFurniture} type="number" id="rotation" name="rotation" disabled={targets.length === 0}/><br />
               <br /><br />
 
             </div>
