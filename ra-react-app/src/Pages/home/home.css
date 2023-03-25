@@ -102,6 +102,10 @@ input:read-only {
   background-color: #E4E4E4;
 }
 
+input:disabled {
+  background-color: #E4E4E4;
+}
+
 
 /* The switch - the box around the slider */
 .switch {
@@ -251,7 +255,21 @@ input:checked+.slider:before {
   display: none;
 }
 
+.active-drag .moveable-control {
+  visibility: hidden;
+}
 
+.active-drag .moveable-line.moveable-rotation-line {
+  visibility: hidden;
+}
+
+.active-drag .moveable-line {
+  visibility: hidden;
+}
+
+.active-drag .moveable-dimension {
+  visibility: hidden;
+}
 
 .home-page {
   font-family: "Saira Semi Condensed", sans-serif;

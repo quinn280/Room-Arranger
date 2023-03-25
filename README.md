@@ -25,6 +25,7 @@ Notes:
 1. X and Y refer to the distance from the top left corner of the room to the top left corner of the object
 2. X, Y, Width, Height are the values when the object has 0 rotation. If there is non-zero rotation, the resulting dimensions and position needs to be calculated.
 3. Rotation values are in degrees in range [0, 360]. X, Y, Width, Height values are inches.
+4. X and Y values might not correlate to the API values
 
 This room layout exports the following JSON data
 
