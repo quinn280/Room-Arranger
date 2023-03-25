@@ -512,6 +512,10 @@ const Home = () => {
     rotateInputRef.current.value = '';
   }
 
+  const getNumFurniture = () => {
+    return activeObjects.filter(o => o.type === "furniture").length;
+  }
+
   
   return (
     <div className="home-page">
@@ -742,7 +746,7 @@ const Home = () => {
               <button onClick={bringFront} disabled={targets.length === 0}>Bring Front</button>
               <button onClick={sendBack} disabled={targets.length === 0}>Send Back</button>
               <br /><br />
-              <button onClick={clearFurniture}>Delete All</button><br />
+              <button onClick={clearFurniture} disabled={getNumFurniture() === 0}>Delete All Furniture</button><br />
               <button onClick={exportData}>Dev: API Post</button>
             </div>
             :
