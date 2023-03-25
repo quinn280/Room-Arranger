@@ -255,7 +255,17 @@ input:checked+.slider:before {
   display: none;
 }
 
+.active-drag .moveable-control {
+  visibility: hidden;
+}
 
+.active-drag .moveable-line {
+  visibility: hidden;
+}
+
+.active-drag .moveable-dimension {
+  visibility: hidden;
+}
 
 .home-page {
   font-family: "Saira Semi Condensed", sans-serif;

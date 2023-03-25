@@ -575,10 +575,16 @@ const Home = () => {
                   );
                 }}
                 onDragStart={e => {
-                  e.target.focus();
+                  e.target.focus();           
+                }}
+                onDragEnd={e => {
+                  const controlBox = e.moveable.controlBox.element;
+                  controlBox.classList.remove('active-drag');
                 }}
                 onDrag={e => {
                   e.target.style.transform = e.transform;
+                  const controlBox = e.moveable.controlBox.element;
+                  controlBox.classList.add('active-drag');
                 }}
                 onRotate={e => {
                   e.target.style.transform = e.drag.transform;
@@ -589,8 +595,10 @@ const Home = () => {
                   e.target.style.transform = e.drag.transform;
                 }}
                 onRenderEnd={e => {
-                  updateFurnitureForm(e);
                   updateAOStorage(e);
+                }}
+                onRender={e => {
+                  updateFurnitureForm(e);
                 }}
               ></Moveable>
               <Selecto
