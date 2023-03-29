@@ -3,7 +3,7 @@ import sys
 import math
 # Ripped from https://github.com/JuantAldea/Separating-Axis-Theorem
 # Thanks Juan!
-from separation_axis_theorem import *
+from .separation_axis_theorem import *
 
 """
 Gets coordinates of the furnitures 4 corners given one corner,
@@ -31,23 +31,21 @@ def roomRate(roomData):
         return i
   def getBed(_furniture):
     for i in _furniture:
-      if i['type'] == 'bed':
+      if i['category'] == 'Bed':
         return i
 
   exitDoor = getFirstDoor(roomData['activeObjects'])
   
   complaints = []
   rating = 100
-  _bed = getBed(roomData['furniture'])
+  _bed = getBed(roomData['activeObjects'])
   
-  if _bed['heading'] % 90 != 0:
+  if _bed['rotate'] % 90 != 0:
     complaints.append('Move your bed against your wall')
     rating -= 20
       
-  bedAng = math.radians(_bed['heading'])
-  width = _bed['dimensions'][0]
-  height = _bed['dimensions'][1]
-  _bedCoordinates = rectangle_corners(_bed['coordinates'][0],_bed['coordinates'][1], width, height, _bed['heading'])
+  _bedCoordinates = rectangle_corners(_bed['x'],_bed['y'], _bed['width'], _bed['height'], _bed['rotate'])
+  return _bedCoordinates
 
 
 
