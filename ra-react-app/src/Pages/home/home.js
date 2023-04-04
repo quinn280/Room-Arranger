@@ -332,10 +332,18 @@ const Home = () => {
     axios.post(fengShuiAPIURL, jsonObj)
       .then(response => {
         console.log(response.data);
+        const responseData = JSON.parse(response.data);
+        showFengShuiResults(responseData)    
       })
       .catch(error => {
         console.log(error);
-      });
+      }); 
+  }
+
+  const showFengShuiResults = (results) =>
+  {
+    const alertStr = `Rating: ${results['rating']}/100\n\nNotes:\n\n${results['complaints'].length > 0 ? results['complaints'] : "None"}`
+    window.alert(alertStr);
   }
 
   const bringFront = () => {
@@ -769,7 +777,7 @@ const Home = () => {
               <button onClick={sendBack} disabled={targets.length === 0}>Send Back</button>
               <br /><br />
               <button onClick={clearFurniture} disabled={getNumFurniture() === 0}>Delete All Furniture</button><br />
-              <button onClick={exportData}>Dev: API Post</button>
+              <button onClick={exportData}>Score Feng Shui</button>
               <button onClick={exportRecData} disabled={targets.length !== 1}>Recommend</button>
             </div>
             :
@@ -807,7 +815,7 @@ const Home = () => {
               <br /><br />
               <button onClick={removeActiveTargets} disabled={targets.length === 0}>Delete</button>
               <br/><br/>
-              <button onClick={exportData}>Dev: API Post</button>
+              <button onClick={exportData}>Score Feng Shui</button>
             </div>
         }
         <div>
