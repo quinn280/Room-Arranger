@@ -54,7 +54,7 @@ def roomRate(roomData):
   _bed = getBed(roomData['activeObjects'])
   
   if _door and _bed:
-    roomWidth = int(roomData['roomDimensions']['width'][:-2])
+    roomWidth = int(roomData['roomDimensions']['width'])
     _bedCoordinates = rectangle_corners(_bed['x'],_bed['y'], _bed['width'], _bed['height'], _bed['rotate'])
     _doorCollision = rectangle_corners(_door['x'],_door['y'],_door['width'], roomWidth, _door['rotate'])
 
