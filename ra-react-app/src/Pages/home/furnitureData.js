@@ -23,7 +23,7 @@ const furnitureData = [
       defaultWidth: 20,
       defaultHeight: 20,
       description: "SideTable",
-      category: "Table",
+      category: "SideTable",
       type: "furniture",
     },
     {
@@ -41,7 +41,7 @@ const furnitureData = [
       defaultWidth: 50,
       defaultHeight: 40,
       description: "Armchair",
-      category: "idk",
+      category: "Armchair",
       type: "furniture",
     },
     {
@@ -50,7 +50,7 @@ const furnitureData = [
       defaultWidth: 40,
       defaultHeight: 40,
       description: "Bean Bag",
-      category: "idk",
+      category: "Bean Bag",
       type: "furniture",
     },
     {
@@ -59,7 +59,7 @@ const furnitureData = [
       defaultWidth: 60,
       defaultHeight: 100,
       description: "Carpet",
-      category: "idk",
+      category: "Carpet",
       type: "furniture",
     },
     {
@@ -68,7 +68,7 @@ const furnitureData = [
       defaultWidth: 46,
       defaultHeight: 46,
       description: "Chair",
-      category: "idk",
+      category: "Chair",
       type: "furniture",
     },
     {
@@ -76,8 +76,8 @@ const furnitureData = [
       url: "vectors/furniture/deskchair.svg",
       defaultWidth: 40,
       defaultHeight: 48,
-      description: "Chair",
-      category: "idk",
+      description: "Desk Chair",
+      category: "Chair",
       type: "furniture",
     },
     {
@@ -86,7 +86,7 @@ const furnitureData = [
       defaultWidth: 94,
       defaultHeight: 66,
       description: "Dining",
-      category: "idk",
+      category: "Dining",
       type: "furniture",
     },
     {
@@ -95,7 +95,7 @@ const furnitureData = [
       defaultWidth: 32,
       defaultHeight: 32,
       description: "Lamp",
-      category: "idk",
+      category: "Lamp",
       type: "furniture",
     },
     {
@@ -104,7 +104,7 @@ const furnitureData = [
       defaultWidth: 94,
       defaultHeight: 65,
       description: "Couch",
-      category: "idk",
+      category: "Couch",
       type: "furniture",
     },
     {
@@ -113,7 +113,7 @@ const furnitureData = [
       defaultWidth: 32,
       defaultHeight: 32,
       description: "Plant",
-      category: "idk",
+      category: "Plant",
       type: "furniture",
     },
     {
@@ -122,7 +122,7 @@ const furnitureData = [
       defaultWidth: 40,
       defaultHeight: 40,
       description: "Fridge",
-      category: "idk",
+      category: "Fridge",
       type: "furniture",
     },
     {
@@ -131,7 +131,7 @@ const furnitureData = [
       defaultWidth: 111,
       defaultHeight: 28,
       description: "TV Stand",
-      category: "idk",
+      category: "TV Stand",
       type: "furniture",
     },
     {
@@ -139,8 +139,8 @@ const furnitureData = [
       url: "vectors/furniture/twinbed.svg",
       defaultWidth: 80,
       defaultHeight: 46,
-      description: "Twin",
-      category: "idk",
+      description: "Twin Bed",
+      category: "Bed",
       type: "furniture",
     },
     {
@@ -149,7 +149,7 @@ const furnitureData = [
       defaultWidth: 72,
       defaultHeight: 56,
       description: "Capybara",
-      category: "idk",
+      category: "Capybara",
       type: "furniture",
     },
     {
@@ -158,7 +158,7 @@ const furnitureData = [
       defaultWidth: 50,
       defaultHeight: 50,
       description: "Duck",
-      category: "idk",
+      category: "Duck",
       type: "furniture",
     },
     
