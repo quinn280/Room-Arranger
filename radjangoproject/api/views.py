@@ -1,8 +1,8 @@
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .furn_rec import *
+from .rating import roomRate
 import json
-
 
 @api_view(['GET'])
 def getData(request):
@@ -11,8 +11,9 @@ def getData(request):
 @api_view(['POST'])
 def testPost(request):
     print(request.data)
-    return Response("woah")
-
+    rating = roomRate(request.data)
+    return Response(rating)
+    
 @api_view(['POST'])
 def recommendFurniture(request):
     print(request.data)

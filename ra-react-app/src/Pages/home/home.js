@@ -13,8 +13,8 @@ const furnRecAPIURL = "http://127.0.0.1:8000/furnRec/";
 const inchPixelRatio = 3;
 const wallWidth = 1;
 const defaultRoomDimensions = {
-  width: "168in",
-  height: "144in"
+  width: "168",
+  height: "144"
 }
 const Modes = Object.freeze({ room: "room", furnish: "furnish" }) // modes enum
 
