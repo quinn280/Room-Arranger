@@ -8,7 +8,8 @@ import './home.css';
 import furnitureList from "./furnitureData.js";
 import structureList from "./structureData.js"
 
-const apiurl = "http://127.0.0.1:8000/testpost/";
+const fengShuiAPIURL = "http://127.0.0.1:8000/testpost/";
+const furnRecAPIURL = "http://127.0.0.1:8000/furnRec/";
 const inchPixelRatio = 3;
 const wallWidth = 1;
 const defaultRoomDimensions = {
@@ -196,6 +197,27 @@ const Home = () => {
     handleRemove(uidArray);
   } 
 
+  const exportRecData = () => 
+  {
+     if (targets.length !== 1)
+      return;
+
+    const uid = targets[0].id;
+    const foundItem = activeObjects.find(o => o.uid === uid);
+    const jsonStr = JSON.stringify(foundItem, undefined, 4);
+
+    console.log("posted: ")
+    console.log(jsonStr);
+    console.log("response: ")
+    axios.post(furnRecAPIURL, foundItem)
+      .then(response => {
+        console.log(response.data);
+      })
+      .catch(error => {
+        console.log(error);
+      });
+  }
+
   const handleZoomChange = (newZoom) => {
     if (newZoom < .1 || newZoom > 10)
       return;
@@ -307,7 +329,7 @@ const Home = () => {
     console.log("posted: ")
     console.log(jsonStr);
     console.log("response: ")
-    axios.post(apiurl, jsonObj)
+    axios.post(fengShuiAPIURL, jsonObj)
       .then(response => {
         console.log(response.data);
       })
@@ -748,6 +770,7 @@ const Home = () => {
               <br /><br />
               <button onClick={clearFurniture} disabled={getNumFurniture() === 0}>Delete All Furniture</button><br />
               <button onClick={exportData}>Dev: API Post</button>
+              <button onClick={exportRecData} disabled={targets.length !== 1}>Recommend</button>
             </div>
             :
             <div className="roomFormEntry" key="roomFormEntry">
