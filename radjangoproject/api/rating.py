@@ -41,11 +41,20 @@ def getFirstDoor(_doors):
     if i['category'] == "door":
       return i
   return 0
+
 def getBed(_furniture):
   for i in _furniture:
     if i['category'] == 'Bed':
       return i
   return 0
+
+def getSideTables(_furniture):
+  vectorReturn = []
+  for i in _furniture:
+    if i['category'] == 'SideTable':
+      vectorReturn.append(i)
+  
+  return vectorReturn
 
 def doorAndBedCheck(_door, _bed, room, jsonData):
   if _door and _bed:
@@ -68,10 +77,12 @@ def doorAndBedCheck(_door, _bed, room, jsonData):
     jsonData['complaints'].append('Consider adding a bed to your room')
     jsonData['rating'] -= 90
   else:
-    jsonData['complaints'].append('Add a door to your room to complete it')
+    jsonData['complaints'].append('Add a door to your room to score your Feng Shui it')
     jsonData['rating'] = 0
   
   return jsonData
+  
+def symetrySideTable(_sideTables, _bed, jsonData):
   
 
 
@@ -85,34 +96,12 @@ def roomRate(roomData):
 
   _door = getFirstDoor(roomData['activeObjects'])
   _bed = getBed(roomData['activeObjects'])
-  
+  _sideTables = getSideTables(roomData['activeObjects'])
+
   returnJSON = doorAndBedCheck(_door, _bed, roomData, returnJSON)
-  """
-  #Checks for door in view of bed
-  if _door and _bed:
-    roomWidth = int(roomData['roomDimensions']['width'])
-    _bedCoordinates = rectangle_corners(_bed['x'],_bed['y'], _bed['width'], _bed['height'], _bed['rotate'])
-    _doorCollision = rectangle_corners(_door['x'],_door['y'],_door['width'], roomWidth, _door['rotate'])
 
-    returnJSON['DEBUG']['bedCoord'] = _bedCoordinates
-    returnJSON['DEBUG']['doorCoord'] = _doorCollision
-
-    separateAxis = separating_axis_theorem(_bedCoordinates, _doorCollision)
-    
-    if separateAxis:
-      returnJSON['complaints'].append('Move your bed out of line of the doorway')
-      returnJSON['rating'] -= 50
-
-    returnJSON['DEBUG']['bedOutOfLine'] = separateAxis
-  elif _door and not _bed:
-    returnJSON['complaints'].append('Consider adding a bed to your room')
-    returnJSON['rating'] -= 90
-  else:
-    returnJSON['complaints'].append('Add a door to your room to complete it')
-    returnJSON['rating'] = 0
-  """
+  if()
   
-
   
   
   returnJSON['rating'] = max(returnJSON['rating'], 0)
