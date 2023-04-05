@@ -13,7 +13,6 @@ def returnSomeStuff(furniture_data):
     ikea_search = ikea_search + search.replace(' ', '%20')
     wayfair_search = wayfair_search + search.replace(' ', '+')
 
-
     links = {}
     links['amazon'] = amazon_search
     links['ikea'] = ikea_search
