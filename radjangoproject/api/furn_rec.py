@@ -7,12 +7,11 @@ def returnSomeStuff(furniture_data):
     
     amazon_search = "https://www.amazon.com/s?k="
 
-    search = furniture_data['description'] + " " + furniture_data['width'] + " by " + furniture_data['height']
+    search = furniture_data['description'] + " " + str(furniture_data['width']) + " by " + str(furniture_data['height'])
 
     amazon_search = amazon_search + search.replace(' ', '+')
     ikea_search = ikea_search + search.replace(' ', '%20')
     wayfair_search = wayfair_search + search.replace(' ', '+')
-
 
     links = {}
     links['amazon'] = amazon_search
