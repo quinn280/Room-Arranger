@@ -50,5 +50,8 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "react-test-renderer": "^18.2.0"
+  }
 }
