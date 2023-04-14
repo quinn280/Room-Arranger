@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import './saved.css';
+import axios from 'axios';
 
 const defaultRoomDimensions = {
     width: "168",
@@ -58,50 +59,91 @@ function formatDate(dateString) {
 }
 
 const Saved = () => {
-    const [fileList, setFileList] = useState((localStorage.fileList) ? JSON.parse(localStorage.fileList) : []);
+    const [fileList, setFileList] = useState([]);
     const [sortType, setSortType] = useState((localStorage.sortType) ? JSON.parse(localStorage.sortType) : SortTypes.dateModified);
     const navigate = useNavigate();
 
     React.useEffect(() => {
-        sortFiles();
+        getFiles();
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+    const getFiles = async()  => {
+        axios.get("http://localhost:8000/api/file-list/")
+            .then(response => {
+                setFileList(response.data);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    };
+
+    const removeFile = async (fileID) => {
+        setFileList(fileList.filter(f => f.fileID !== fileID));
+
+        axios.delete(`http://localhost:8000/api/file-delete/${fileID}/`)
+            .then(response => {        
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    };
+
+    const addFile = async (fileObj) => {
+        axios.post(`http://localhost:8000/api/file-create/`, fileObj)
+            .then(response => {
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    };
+
+    const updateFile = async (fileID, fileObj) => {
+        axios.post(`http://localhost:8000/api/file-update/${fileID}/`, fileObj)
+            .then(response => {
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    };
+
+    const changeFileName = (fileID) => 
+    {      
+        let _fileList = [...fileList];
+        let foundIndex = fileList.findIndex(file => file.fileID === fileID);
+        let foundFile = {..._fileList[foundIndex]};
+
+        let newName = window.prompt("Enter a new name", foundFile.name)
+        if (!newName)
+            newName = foundFile.name; 
+
+        foundFile.name = newName;
+        _fileList[foundIndex] = foundFile;
+        setFileList(_fileList);
+        updateFile(fileID, foundFile);
+    }
 
     const openNewFile = () => {
         const timestamp = new Date(Date.now());
         const uid = generateUID();
 
         const fileObj = {
+            name: "Untitled",
             fileID: uid,
-            createDate: timestamp,
             modifiedDate: timestamp,
-            fileName: "Untitled",
-            roomData: {
-                roomDimensions: defaultRoomDimensions,
-                activeObjects: []
-            },
-            settings: {
-                designMode: Modes.room,
-                roomLock: false,
-            }
+            createDate: timestamp,   
         }
 
-        const _fileList = [...fileList, fileObj];
-        localStorage.fileList = JSON.stringify(_fileList);
+        console.log(fileObj);
+
+        //setFileList([...fileList, fileObj])
+        addFile(fileObj);
+        
         openFile(fileObj.fileID);
     }
 
     const openFile = (fileID) => {
+        console.log(`Opening ${fileID}`)
         navigate(`/file/${fileID}`);
-    }
-
-    const handleOpen = (e) => {
-        openFile(e.target.id);
-    }
-
-    const removeFile = (fileID) => {
-        const _fileList = fileList.filter(f => f.fileID !== fileID);
-        localStorage.fileList = JSON.stringify(_fileList);
-        setFileList(_fileList);
     }
 
     const sortFiles = () => {
@@ -126,8 +168,9 @@ const Saved = () => {
         }
 
         _fileList.sort(sortFunction);
-        localStorage.fileList = JSON.stringify(_fileList);
+        console.log('sorted', _fileList);
         setFileList(_fileList);
+        console.log('result', fileList);
     }
 
     return (
@@ -137,11 +180,12 @@ const Saved = () => {
             <div className="designCardContainer">
                 {
                     fileList.map(f => (
-                        <div className="designCard" key={f.fileID} id={f.fileID} onClick={handleOpen}>
-                            <p>{f.fileName}</p>
+                        <div className="designCard" key={f.fileID} id={f.fileID} onClick={() => openFile(f.fileID)}>
+                            <p>{f.name}</p>
                             <p>last modified {formatDate(f.modifiedDate)}</p>
                             <p>{f.fileID}</p>
-                            <button onClick={(e) => {e.stopPropagation(); removeFile(f.fileID);}}>X</button>
+                            <button onClick={(e) => { e.stopPropagation(); removeFile(f.fileID); }}>X</button>
+                            <button onClick={(e) => { e.stopPropagation(); changeFileName(f.fileID); }}>Rename</button>
                         </div>
                     ))
                 }
