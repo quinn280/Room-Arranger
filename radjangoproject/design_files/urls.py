@@ -2,15 +2,11 @@ from django.urls import path
 from . import views
  
 urlpatterns = [ 
-    path('api/file-list/', views.file_list),
-    path('api/file-detail/<str:fID>/', views.file_detail),
-    path('api/file-create/', views.file_create),
-    path('api/file-update/<str:fID>/', views.file_update),
-    path('api/file-delete/<str:fID>/', views.file_delete),
+    path('api/files/', views.file_list),
+    path('api/files/<str:fID>/', views.file_detail),
 
-    path('api/ro-list/', views.ro_list),
-    path('api/ro-detail/<str:oID>/', views.ro_detail),
-    path('api/ro-create/', views.ro_create),
-    path('api/ro-update/<str:oID>/', views.ro_update),
-    path('api/ro-delete/<str:oID>/', views.ro_delete),
+    path('api/ro/DeleteAllByID/', views.ro_delete_by_ids),
+    path('api/ro/file/<str:fID>/', views.ro_in_file),
+    path('api/ro/', views.ro_create),
+    path('api/ro/<str:oID>/', views.ro_detail),
 ]

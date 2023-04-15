@@ -64,46 +64,31 @@ const Saved = () => {
     const navigate = useNavigate();
 
     React.useEffect(() => {
-        getFiles();
+        const fileListPromise = getFiles();
+
+        Promise.all([fileListPromise]).then(([fileListResponse]) => {
+            setFileList(fileListResponse.data);
+        })
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     const getFiles = async()  => {
-        axios.get("http://localhost:8000/api/file-list/")
-            .then(response => {
-                setFileList(response.data);
-            })
-            .catch(error => {
-                console.log(error);
-            });
+        return axios.get("http://localhost:8000/api/files/");
     };
 
     const removeFile = async (fileID) => {
         setFileList(fileList.filter(f => f.fileID !== fileID));
-
-        axios.delete(`http://localhost:8000/api/file-delete/${fileID}/`)
-            .then(response => {        
-            })
-            .catch(error => {
-                console.log(error);
-            });
+        axios.delete(`http://localhost:8000/api/files/${fileID}/`);
+        axios.delete(`http://localhost:8000/api/ro/file/${fileID}/`);
     };
 
-    const addFile = async (fileObj) => {
-        axios.post(`http://localhost:8000/api/file-create/`, fileObj)
-            .then(response => {
-            })
-            .catch(error => {
-                console.log(error);
-            });
+    const addFileAndOpen = async (fileObj) => {
+        await axios.post(`http://localhost:8000/api/files/`, fileObj).then(() => {
+            openFile(fileObj.fileID);
+    });
     };
 
     const updateFile = async (fileID, fileObj) => {
-        axios.post(`http://localhost:8000/api/file-update/${fileID}/`, fileObj)
-            .then(response => {
-            })
-            .catch(error => {
-                console.log(error);
-            });
+        axios.put(`http://localhost:8000/api/files/${fileID}/`, fileObj);
     };
 
     const changeFileName = (fileID) => 
@@ -133,12 +118,7 @@ const Saved = () => {
             createDate: timestamp,   
         }
 
-        console.log(fileObj);
-
-        //setFileList([...fileList, fileObj])
-        addFile(fileObj);
-        
-        openFile(fileObj.fileID);
+        addFileAndOpen(fileObj);  
     }
 
     const openFile = (fileID) => {

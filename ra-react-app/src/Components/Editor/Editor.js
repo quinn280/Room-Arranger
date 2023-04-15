@@ -13,19 +13,8 @@ const fengShuiAPIURL = "http://127.0.0.1:8000/testpost/";
 const furnRecAPIURL = "http://127.0.0.1:8000/furnRec/";
 const inchPixelRatio = 3;
 const wallWidth = 1;
-const defaultRoomDimensions = {
-  width: "168",
-  height: "144"
-}
 const Modes = Object.freeze({ room: "room", furnish: "furnish" }) // modes enum
-
-function compareByUid(a,b) {
-  if (a.uid < b.uid)
-     return -1;
-  if (a.uid > b.uid)
-    return 1;
-  return 0;
-}
+const MAX_Z = 2147483647;
 
 const inchToPx = (inches) => {
   inches = parseFloat(inches);
@@ -68,16 +57,7 @@ const parseTransform = (transformText) => {
   return { rotate: rotate, x: x, y: y };
 }
 
-const getFile = async (fileID) => {
-  axios.get(`http://localhost:8000/api/file-detail/${fileID}/`)
-      .then(response => {
-        console.log(response.data);
-        return response.data;
-      })
-      .catch(error => {
-          console.log(error);
-      });
-};
+
 
 // 2 high level objects. 1 is design file, 1 is array of queried room objects
 // file-detail to get file at start, 
@@ -85,12 +65,9 @@ const getFile = async (fileID) => {
 const Editor = () => {
   let { file } = useParams();
 
-  const fileData = getFile(file);
-
+  const [isLoading, setLoading] = useState(true);
   const [activeObjects, setActiveObjects] = useState([]);
-  const [roomDimensions] = useState(defaultRoomDimensions)
-  const [designMode, setDesignMode] = useState(Modes.room);
-  const [roomLock, setRoomLock] = useState(false);
+  const [fileData, setFileData] = useState();
 
   const [zoom, setZoom] = useState(1);
   const [targets, setTargets] = useState([]);
@@ -110,14 +87,117 @@ const Editor = () => {
   const roomHeightInputRef = useRef(null);
 
   React.useEffect(() => {
-    window.addEventListener('resize', zoomFit)
-    initScrollOptions();
-    zoomFit();
-    if (designMode === Modes.room) updateRoomForm();
+    const filePromise = getFileDB(file);
+    const objectsPromise = getObjectsDB(file);
+
+    Promise.all([filePromise, objectsPromise]).then(([fileResponse, objectsResponse]) => {
+      setFileData(fileResponse.data);
+      setActiveObjects(objectsResponse.data);
+      setLoading(false);
+    })
 
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  
+  const getFileDB = async (fileID) => {
+    return axios.get(`http://localhost:8000/api/files/${fileID}/`);
+  };
+
+  const updateFileDB = async (fileID, fileObj) => {
+    return axios.put(`http://localhost:8000/api/files/${fileID}/`, fileObj);
+  };
+
+  const getObjectsDB = async (fileID) => {
+    return axios.get(`http://localhost:8000/api/ro/file/${fileID}/`);
+  }
+
+  const addObjectDB = async (obj) => {
+    return axios.post(`http://localhost:8000/api/ro/`, obj);
+  }
+
+  const updateObjectDB = async (obj, uid) => {
+    return axios.put(`http://localhost:8000/api/ro/${uid}/`, obj);
+  }
+
+  const removeObjectsArrayDB = async (uidArray) => {
+    return axios.post(`http://localhost:8000/api/ro/DeleteAllByID/`, uidArray);
+  }
+
+  const getMaxZ = () => {
+    return Math.max(...activeObjects.map(obj => obj.z));
+  }
+
+  const getMinZ = () => {
+    return Math.min(...activeObjects.map(obj => obj.z));
+  }
+
+  const getNewZ = (toTop = true) => {
+    if (activeObjects.length < 1)
+      return parseInt(MAX_Z / 2);
+
+    let newZ = (toTop) ? getMaxZ() + 1 : getMinZ() - 1;
+    return newZ;
+  }
+
+  const updateFileSetting = (setting, newValue, updateState = true) => {
+    const newFileData = { ...fileData };
+    newFileData[setting] = newValue;
+    updateFileDB(file, newFileData);
+
+    if (updateState)
+      setFileData(newFileData);
+  }
+
+  const updateFileSettings = (settings, newValues, updateState = true) => {
+    if (settings.length !== newValues.length)
+      return;
+
+    const newFileData = { ...fileData };
+    for (let i = 0; i < settings.length; i++) {
+      newFileData[settings[i]] = newValues[i];
+    }
+
+    updateFileDB(file, newFileData);
+    if (updateState)
+      setFileData(newFileData);
+  }
+
+  const updateObjectValue = (uid, property, newValue, updateState = true) => {
+    let _activeObjects = [...activeObjects];
+    let foundIndex = _activeObjects.findIndex(o => o.uid === uid);
+    let foundObject = {..._activeObjects[foundIndex]};
+
+    foundObject[property] = newValue;
+
+    updateObjectDB(foundObject, uid);
+    if (updateState)
+    {
+      _activeObjects[foundIndex] = foundObject;
+      setActiveObjects(_activeObjects);
+    }   
+  }
+
+  const updateObjectValues = (uid, properties, newValues, updateState = true) => {
+    if (properties.length !== newValues.length)
+      return;
+      
+    let _activeObjects = [...activeObjects];
+    let foundIndex = _activeObjects.findIndex(o => o.uid === uid);
+    let foundObject = {..._activeObjects[foundIndex]};
+
+    for (let i = 0; i < properties.length; i++)
+    {
+      foundObject[properties[i]] = newValues[i];
+    }
+
+    console.log(foundObject);
+    
+    updateObjectDB(foundObject, uid);
+    if (updateState)
+    {
+      _activeObjects[foundIndex] = foundObject;
+      setActiveObjects(_activeObjects);
+    }   
+  }
 
   const initScrollOptions = () => {
     setScrollOptions({
@@ -134,21 +214,37 @@ const Editor = () => {
   }
 
   const [requestCallbacksFurniture] = useState(() => {
-    function request() {
+    function request(caller) {
 
-      moveableRef.current.request("draggable", {
-        x: inchToPx(xInputRef.current.value),
-        y: inchToPx(yInputRef.current.value),
-      }, true);
+      if (caller === "x" || caller === "y")
+      {
+        moveableRef.current.request("draggable", {
+          x: inchToPx(xInputRef.current.value),
+          y: inchToPx(yInputRef.current.value),
+        }, true);
+      }
+      else if (caller === "height" || caller === "width")
+      {
+        moveableRef.current.request("resizable", {
+          offsetWidth: inchToPx(widthInputRef.current.value),
+          offsetHeight: inchToPx(heightInputRef.current.value),
+        }, true);
+      }
+      else if (caller === "rotation")
+      {
+        moveableRef.current.request("rotatable", {
+          rotate: parseInt(rotateInputRef.current.value),
+        }, true);
+      }
+      else
+      {
+        console.log("requestCallBacksObjects: Unexpected Caller")
+      }
+      
 
-      moveableRef.current.request("resizable", {
-        offsetWidth: inchToPx(widthInputRef.current.value),
-        offsetHeight: inchToPx(heightInputRef.current.value),
-      }, true);
+      
 
-      moveableRef.current.request("rotatable", {
-        rotate: parseInt(rotateInputRef.current.value),
-      }, true);
+      
     }
 
     return {
@@ -156,15 +252,18 @@ const Editor = () => {
         const ev = (e.nativeEvent || e);
 
         if (typeof ev.data === "undefined") {
-          request();
+          request(e.target.id);
         }
       },
       onKeyUp(e) {
         e.stopPropagation();
 
         if (e.keyCode === 13) {
-          request();
+          request(e.target.id);
         }
+      },
+      onBlur(e) {
+        request(e.target.id);
       },
     };
   });
@@ -173,8 +272,8 @@ const Editor = () => {
 
     function request() {
       boxRef.current.request("resizable", {
-        offsetWidth: inchToPx(roomWidthInputRef.current.value) + inchToPx(2*wallWidth),
-        offsetHeight: inchToPx(roomHeightInputRef.current.value) + inchToPx(2*wallWidth),
+        offsetWidth: inchToPx(roomWidthInputRef.current.value) + inchToPx(2 * wallWidth),
+        offsetHeight: inchToPx(roomHeightInputRef.current.value) + inchToPx(2 * wallWidth),
       }, true);
     }
 
@@ -198,13 +297,10 @@ const Editor = () => {
   });
 
 
-  const handleRemove = (uidArray) => {   
-    var _activeObjects = activeObjects.filter(f => !uidArray.includes(f.uid));
+  const handleRemove = (uidArray) => {
+    setActiveObjects(activeObjects.filter(f => !uidArray.includes(f.uid)));
+    removeObjectsArrayDB(uidArray);
 
-    _activeObjects.sort(compareByUid);
-    _activeObjects.forEach((o, i) => {o.z = i+1;})
-
-    setActiveObjects(() => _activeObjects);
     setTargets([]);
     clearObjectForm();
   };
@@ -212,11 +308,10 @@ const Editor = () => {
   const removeActiveTargets = () => {
     const uidArray = targets.map(t => t.id);
     handleRemove(uidArray);
-  } 
+  }
 
-  const exportRecData = () => 
-  {
-     if (targets.length !== 1)
+  const exportRecData = () => {
+    if (targets.length !== 1)
       return;
 
     const uid = targets[0].id;
@@ -243,13 +338,13 @@ const Editor = () => {
   }
 
   const handleAdd = (itemKey) => {
-    const activeList = (designMode === Modes.room ? structureList : furnitureList);
+    const activeList = (fileData.designMode === Modes.room ? structureList : furnitureList);
     const foundItem = activeList.find(f => parseInt(f.itemKey) === parseInt(itemKey));
 
     const newActvObj = Object.assign({}, foundItem);
     newActvObj.fileID = file;
     newActvObj.uid = generateUID();
-    newActvObj.z = activeObjects.length + 1; // initialize to top z-index
+    newActvObj.z = getNewZ();
     newActvObj.width = newActvObj.defaultWidth;
     newActvObj.height = newActvObj.defaultHeight;
     newActvObj.rotate = 0;
@@ -261,8 +356,9 @@ const Editor = () => {
 
     const _activeObjects = [...activeObjects, newActvObj];
     setActiveObjects(() => _activeObjects);
+    addObjectDB(newActvObj);
 
-    // schedule async callback
+    // schedule async callback to highlight and update forms
     setTimeout(() => {
       const elem = document.getElementById(newActvObj.uid);
       setTargets([elem]);
@@ -276,17 +372,14 @@ const Editor = () => {
   }
 
   const clearFurniture = () => {
-    const _activeObjects = activeObjects.filter((f) => f.type !== "furniture");
-
-    setTargets([]);
-    setActiveObjects(() => _activeObjects);
-    clearObjectForm();
+    const uidArray = activeObjects.filter(obj => obj.type === "furniture").map(obj => obj.uid);
+    handleRemove(uidArray);
   }
 
   const handleModeChange = (e) => {
     const checked = e.target.checked;
     const newMode = (checked ? Modes.furnish : Modes.room)
-    setDesignMode(newMode);
+    updateFileSetting("designMode", newMode);
     setTargets([]);
 
     if (newMode === Modes.room) {
@@ -296,7 +389,7 @@ const Editor = () => {
 
   const handleRoomLockChange = (e) => {
     const checked = e.target.checked;
-    setRoomLock(checked);
+    updateFileSetting("roomLock", checked);
   }
 
   const onKeyPressed = (e) => {
@@ -321,8 +414,8 @@ const Editor = () => {
   const updateRoomFormResizeEnd = (e) => {
     requestAnimationFrame(() => {
       const rect = e.moveable.getRect();
-      roomWidthInputRef.current.value = `${round(pxToInch(rect.offsetWidth) - wallWidth*2, 0)}`;
-      roomHeightInputRef.current.value = `${round(pxToInch(rect.offsetHeight) - wallWidth*2, 0)}`;
+      roomWidthInputRef.current.value = `${round(pxToInch(rect.offsetWidth) - wallWidth * 2, 0)}`;
+      roomHeightInputRef.current.value = `${round(pxToInch(rect.offsetHeight) - wallWidth * 2, 0)}`;
     })
   };
 
@@ -336,7 +429,7 @@ const Editor = () => {
 
   const exportData = () => {
     const jsonObj = {};
-    jsonObj.roomDimensions = roomDimensions;
+    jsonObj.roomDimensions = { width: fileData.width, height: fileData.height };
     jsonObj.activeObjects = activeObjects;
 
     console.log(jsonObj);
@@ -345,15 +438,14 @@ const Editor = () => {
       .then(response => {
         console.log(response.data);
         const responseData = JSON.parse(response.data);
-        showFengShuiResults(responseData)    
+        showFengShuiResults(responseData)
       })
       .catch(error => {
         console.log(error);
-      }); 
+      });
   }
 
-  const showFengShuiResults = (results) =>
-  {
+  const showFengShuiResults = (results) => {
     const alertStr = `Rating: ${results['rating']}/100\n\nNotes:\n\n${results['complaints'].length > 0 ? results['complaints'] : "None"}`
     window.alert(alertStr);
   }
@@ -364,21 +456,7 @@ const Editor = () => {
       return;
 
     const uid = moveableRef.current.refTargets[0].getAttribute("data-key");
-    const foundItem = activeObjects.find(f => f.uid === uid);
-    const oldZ = foundItem.z;
-
-    const _activeObjects = activeObjects.map(f => {
-      if (uid === f.uid) {
-        f.z = activeObjects.length;
-      }
-      else if (f.z > oldZ) {
-        f.z -= 1;
-      }
-
-      return f;
-    })
-
-    setActiveObjects(() => _activeObjects);
+    updateObjectValue(uid, "z", getNewZ());
   }
 
   const sendBack = () => {
@@ -386,21 +464,8 @@ const Editor = () => {
       return;
 
     const uid = moveableRef.current.refTargets[0].getAttribute("data-key");
-    const foundItem = activeObjects.find(f => f.uid === uid);
-    const oldZ = foundItem.z;
-
-    const _activeObjects = activeObjects.map(f => {
-      if (uid === f.uid) {
-        f.z = 1;
-      }
-      else if (f.z < oldZ) {
-        f.z += 1;
-      }
-
-      return f;
-    })
-
-    setActiveObjects(() => _activeObjects);
+    console.log(getNewZ(false))
+    updateObjectValue(uid, "z", getNewZ(false));
   }
 
   const DimensionViewable = {
@@ -439,7 +504,7 @@ const Editor = () => {
       return <div key={"dimension-viewer"} className={"moveable-dimension"} style={{
         position: "absolute",
         left: `${rect.width / 2}px`,
-        top: `${rect.height + 20*(1/zoom)}px`,
+        top: `${rect.height + 20 * (1 / zoom)}px`,
         background: "#4af",
         borderRadius: "2px",
         padding: `${2}px ${4}px`,
@@ -450,7 +515,7 @@ const Editor = () => {
         willChange: "transform",
         transform: `translate(-50%, 0px)`,
       }}>
-        {Math.round(pxToInch(rect.offsetWidth) - 2*wallWidth)}" x {Math.round(pxToInch(rect.offsetHeight) - 2*wallWidth)}"
+        {Math.round(pxToInch(rect.offsetWidth) - 2 * wallWidth)}" x {Math.round(pxToInch(rect.offsetHeight) - 2 * wallWidth)}"
       </div>;
     },
   };
@@ -524,22 +589,18 @@ const Editor = () => {
     boxRef.current.updateRect();
   };
 
-  const updateAOStorage = (e) => {
+  const updateObjectStorage = (e) => {
+    var uid = e.target.id;
     var newX = pxToInch(parseTransform(e.target.style.transform).x);
     var newY = pxToInch(parseTransform(e.target.style.transform).y);
     var newHeight = pxToInch(e.target.style.height);
     var newWidth = pxToInch(e.target.style.width);
     var newRotate = normalizeRotation(parseFloat(parseTransform(e.target.style.transform).rotate));
 
-    var uid = e.target.id;
-    const _activeObjects = [...activeObjects];
-    var foundItem = _activeObjects.find(f => f.uid === uid);
+    const modifiedProperties = ["x", "y", "height", "width", "rotate"];
+    const newValues = [newX, newY, newHeight, newWidth, newRotate];
 
-    foundItem.x = newX;
-    foundItem.y = newY;
-    foundItem.height = newHeight;
-    foundItem.width = newWidth;
-    foundItem.rotate = newRotate;
+    updateObjectValues(uid, modifiedProperties, newValues, false);
   }
 
   const clearObjectForm = () => {
@@ -554,13 +615,16 @@ const Editor = () => {
     return activeObjects.filter(o => o.type === "furniture").length;
   }
 
-  
+  if (isLoading) {
+    return <div className="loading"><h1 className="loadingText">Loading...</h1></div>;
+  }
+
   return (
     <div className="editor">
       <div className="left-bar">
         <div className="card-container">
           {
-            (designMode === Modes.room)
+            (fileData.designMode === Modes.room)
               ?
               structureList.map((f) => (
                 <div className="card structure" key={f.itemKey} data-key={f.itemKey} onClick={() => handleAdd(f.itemKey)}>
@@ -587,8 +651,8 @@ const Editor = () => {
           <div>
             <div className="room" ref={boxRef} id="room"
               style={{
-                width: `${inchToPx(roomDimensions.width)}px`,
-                height: `${inchToPx(roomDimensions.height)}px`,
+                width: `${inchToPx(fileData.width)}px`,
+                height: `${inchToPx(fileData.height)}px`,
                 position: "absolute",
                 borderWidth: `${inchToPx(wallWidth)}px`
               }}>
@@ -628,11 +692,11 @@ const Editor = () => {
                 throttleDrag={0}
                 throttleRotate={5}
                 resizable={true}
-                groupableProps =   {{
+                groupableProps={{
                   rotatable: false,
                   resizable: false,
                 }}
-                renderDirections={(designMode === Modes.furnish) ? ["nw", "n", "ne", "w", "e", "sw", "s", "se"] : ["n", "w", "s", "e"]}
+                renderDirections={(fileData.designMode === Modes.furnish) ? ["nw", "n", "ne", "w", "e", "sw", "s", "se"] : ["n", "w", "s", "e"]}
                 rotatable={true}
                 scrollable={true}
                 scrollOptions={scrollOptions}
@@ -671,12 +735,12 @@ const Editor = () => {
                   });
                 }}
                 onRenderEnd={e => {
-                  updateAOStorage(e);
+                  updateObjectStorage(e);
                   updateFurnitureForm(e);
                 }}
                 onRenderGroupEnd={({ events }) => {
                   events.forEach(ev => {
-                    updateAOStorage(ev);
+                    updateObjectStorage(ev);
                   });
                 }}
                 onRender={e => {
@@ -685,7 +749,7 @@ const Editor = () => {
               ></Moveable>
               <Selecto
                 ref={selectoRef}
-                selectableTargets={(designMode === Modes.furnish) ? [".furn-target"] : [".struc-target"]}
+                selectableTargets={(fileData.designMode === Modes.furnish) ? [".furn-target"] : [".struc-target"]}
                 rootContainer={document.body}
                 dragContainer={".infinite-viewer"}
                 hitRate={0}
@@ -723,7 +787,7 @@ const Editor = () => {
                 dimensionViewable: true,
               }}
               ables={[DimensionViewableRoom]}
-              target={(((designMode === Modes.room) && !(roomLock)) ? ".room" : ".dummyvalue")}
+              target={(((fileData.designMode === Modes.room) && !(fileData.roomLock)) ? ".room" : ".dummyvalue")}
               scrollable={true}
               scrollOptions={scrollOptions}
               ref={boxRef}
@@ -742,7 +806,8 @@ const Editor = () => {
                 var newHeight = round(pxToInch(e.target.style.height), 0);
                 var newWidth = round(pxToInch(e.target.style.width), 0);
 
-                var newRoomDimensions = { width: newWidth, height: newHeight };
+                console.log("resize end");
+                updateFileSettings(["width", "height"], [newWidth, newHeight], false);
               }}
               onScroll={({ direction }) => {
                 viewerRef.current.scrollBy(
@@ -756,7 +821,7 @@ const Editor = () => {
       </div>
       <div className="right-bar">
         {
-          (designMode === Modes.furnish)
+          (fileData.designMode === Modes.furnish)
             ?
             <div>
               <div>
@@ -778,7 +843,7 @@ const Editor = () => {
               <label htmlFor="rotation">Rotation:</label><br />
               <input ref={rotateInputRef} {...requestCallbacksFurniture} type="number" id="rotation" name="rotation" disabled={targets.length !== 1} /><br />
               <br />
-              <button onClick={removeActiveTargets} disabled={targets.length === 0}>Delete</button> 
+              <button onClick={removeActiveTargets} disabled={targets.length === 0}>Delete</button>
               <br />
               <button onClick={bringFront} disabled={targets.length === 0}>Bring Front</button>
               <button onClick={sendBack} disabled={targets.length === 0}>Send Back</button>
@@ -797,13 +862,13 @@ const Editor = () => {
               <br />
               <div>Room Dimensions</div>
               <label htmlFor="roomWidth">Lock:</label>
-              <input type="checkbox" checked={roomLock} onChange={handleRoomLockChange} />
+              <input type="checkbox" checked={fileData.roomLock} onChange={handleRoomLockChange} />
               <br />
               <br />
               <label htmlFor="roomWidth">Width:</label><br />
-              <input readOnly={roomLock} ref={roomWidthInputRef} {...requestCallbacksRoom} type="number" id="roomWidth" name="roomWidth" /><br />
+              <input readOnly={fileData.roomLock} ref={roomWidthInputRef} {...requestCallbacksRoom} type="number" id="roomWidth" name="roomWidth" /><br />
               <label htmlFor="roomHeight">Height:</label><br />
-              <input readOnly={roomLock} ref={roomHeightInputRef} {...requestCallbacksRoom} type="number" id="roomHeight" name="roomHeight" /><br />
+              <input readOnly={fileData.roomLock} ref={roomHeightInputRef} {...requestCallbacksRoom} type="number" id="roomHeight" name="roomHeight" /><br />
               <br />
 
               <div>Object Dimensions</div>
@@ -821,14 +886,14 @@ const Editor = () => {
               <input ref={rotateInputRef} {...requestCallbacksFurniture} type="number" id="rotation" name="rotation" disabled={targets.length !== 1} /><br />
               <br /><br />
               <button onClick={removeActiveTargets} disabled={targets.length === 0}>Delete</button>
-              <br/><br/>
+              <br /><br />
               <button onClick={exportData}>Score Feng Shui</button>
             </div>
         }
         <div>
-          <p className="tog">{designMode === Modes.furnish ? "Floor Plan" : "Furnish"}</p>
+          <p className="tog">{fileData.designMode === Modes.furnish ? "Floor Plan" : "Furnish"}</p>
           <label className="switch tog">
-            <input type="checkbox" checked={(designMode === Modes.furnish)} onChange={handleModeChange} />
+            <input type="checkbox" checked={(fileData.designMode === Modes.furnish)} onChange={handleModeChange} />
             <span className="slider"></span>
           </label>
         </div>

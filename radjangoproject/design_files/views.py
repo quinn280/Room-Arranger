@@ -8,63 +8,79 @@ from .serializers import DesignFileSerializer, RoomObjectSerializer
 from .models import DesignFile, RoomObject
 
 
-@api_view(['GET'])
+@api_view(['GET', 'POST'])
 def file_list(request):
-    files = DesignFile.objects.all()
-    serializer = DesignFileSerializer(files, many=True)
-    return Response(serializer.data)
+    if request.method == 'GET':
+        files = DesignFile.objects.all()
+        serializer = DesignFileSerializer(files, many=True)
+        return Response(serializer.data)
+    elif request.method == 'POST':
+        serializer = DesignFileSerializer(data=request.data)
 
-@api_view(['GET'])
+        if serializer.is_valid():
+            serializer.save()
+
+        return Response("file added")
+
+@api_view(['GET', 'PUT', 'DELETE'])
 def file_detail(request, fID):
-    file = DesignFile.objects.get(fileID=fID)
-    serializer = DesignFileSerializer(file, many=False)
-    return Response(serializer.data)
+    if request.method == 'GET':
+        file = DesignFile.objects.get(fileID=fID)
+        serializer = DesignFileSerializer(file, many=False)
+        return Response(serializer.data)
+    elif request.method == 'PUT':
+        file = DesignFile.objects.get(fileID=fID)
+        serializer = DesignFileSerializer(instance=file, data=request.data)
 
+        if serializer.is_valid():
+            serializer.save()
 
-@api_view(['POST'])
-def file_create(request):
-    serializer = DesignFileSerializer(data=request.data)
-
-    if serializer.is_valid():
-        serializer.save()
-
-    print(serializer.data)
-
-    return Response("file added")
-
-
-@api_view(['POST'])
-def file_update(request, fID):
-    file = DesignFile.objects.get(fileID=fID)
-    serializer = DesignFileSerializer(instance=file, data=request.data)
-
-    if serializer.is_valid():
-        serializer.save()
-
-    return Response(serializer.data)
-
-
-@api_view(['DELETE'])
-def file_delete(request, fID):
-    file = DesignFile.objects.get(fileID=fID)
-    file.delete()
-    return Response("File successfully deleted")
+        return Response(serializer.data)
+    elif request.method == 'DELETE':
+        file = DesignFile.objects.get(fileID=fID)
+        file.delete()
+        return Response("File successfully deleted")
 
 
 ######
 
+@api_view(['POST'])
+def ro_delete_by_ids(request):
+    for oID in request.data:
+        roomObject = RoomObject.objects.get(uid=oID)
+        roomObject.delete()
+    return Response("Delete BY ID")
 
-@api_view(['GET'])
-def ro_list(request):
-    roomObjects = RoomObject.objects.all()
-    serializer = RoomObjectSerializer(roomObjects, many=True)
-    return Response(serializer.data)
 
-@api_view(['GET'])
+@api_view(['GET', 'DELETE'])
+def ro_in_file(request, fID):
+    if request.method == 'GET':
+        roomObjects = RoomObject.objects.all().filter(fileID=fID)
+        serializer = RoomObjectSerializer(roomObjects, many=True)
+        return Response(serializer.data)
+    elif request.method == 'DELETE':
+        RoomObject.objects.filter(fileID=fID).delete()
+        return Response("Objects at file id deleted")
+
+
+@api_view(['GET', 'PUT', 'DELETE'])
 def ro_detail(request, oID):
-    roomObject = RoomObject.objects.get(uid=oID)
-    serializer = RoomObjectSerializer(roomObject, many=False)
-    return Response(serializer.data)
+    if request.method == 'GET':
+        roomObject = RoomObject.objects.get(uid=oID)
+        serializer = RoomObjectSerializer(roomObject, many=False)
+        return Response(serializer.data)
+    elif request.method == 'PUT':
+        roomObject = RoomObject.objects.get(uid=oID)
+        serializer = RoomObjectSerializer(instance=roomObject, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+
+        return Response(serializer.data)
+    elif request.method == 'DELETE':
+        roomObject = RoomObject.objects.get(uid=oID)
+        roomObject.delete()
+        return Response("File successfully deleted")
 
 
 @api_view(['POST'])
@@ -74,24 +90,6 @@ def ro_create(request):
     if serializer.is_valid():
         serializer.save()
 
-    print(serializer.data)
-
     return Response("object added")
 
 
-@api_view(['POST'])
-def ro_update(request, oID):
-    roomObject = DesignFile.objects.get(uid=oID)
-    serializer = RoomObjectSerializer(instance=roomObject, data=request.data)
-
-    if serializer.is_valid():
-        serializer.save()
-
-    return Response(serializer.data)
-
-
-@api_view(['DELETE'])
-def ro_delete(request, oID):
-    roomObject = DesignFile.objects.get(uid=oID)
-    roomObject.delete()
-    return Response("File successfully deleted")

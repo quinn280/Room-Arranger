@@ -270,9 +270,25 @@
   .active-drag .moveable-dimension {
     visibility: hidden;
   }
+
+  .moveable-control-box {
+    z-index: 2147483647!important;
+  }
   
   .editor {
     font-family: "Saira Semi Condensed", sans-serif;
+  }
+
+  .loading {
+    display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  }
+
+  .loadingText {
+    font-size: 5em;
+    color: red;
   }
   
   
