@@ -86,14 +86,28 @@ const Editor = () => {
   const roomWidthInputRef = useRef(null);
   const roomHeightInputRef = useRef(null);
 
+  const getStuff = () => {
+    
+  }
+
   React.useEffect(() => {
     const filePromise = getFileDB(file);
     const objectsPromise = getObjectsDB(file);
 
     Promise.all([filePromise, objectsPromise]).then(([fileResponse, objectsResponse]) => {
       setFileData(fileResponse.data);
-      setActiveObjects(objectsResponse.data);
+      setActiveObjects(objectsResponse.data);  
+      window.addEventListener('resize', zoomFit);      
+      
+
+      setTimeout(() => {
+        initScrollOptions();
+        zoomFit();
+        if (fileResponse.data.designMode === Modes.room) updateRoomForm();
+      }, 0);
+
       setLoading(false);
+      
     })
 
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -138,14 +152,22 @@ const Editor = () => {
     return newZ;
   }
 
+  const updateFileModifiedDate = () => {
+    const newFileData = { ...fileData };
+    newFileData["modifiedDate"] = new Date(Date.now());
+    updateFileDB(file, newFileData);
+  }
+
   const updateFileSetting = (setting, newValue, updateState = true) => {
     const newFileData = { ...fileData };
     newFileData[setting] = newValue;
+    newFileData["modifiedDate"] = new Date(Date.now());
     updateFileDB(file, newFileData);
 
     if (updateState)
       setFileData(newFileData);
   }
+
 
   const updateFileSettings = (settings, newValues, updateState = true) => {
     if (settings.length !== newValues.length)
@@ -155,6 +177,7 @@ const Editor = () => {
     for (let i = 0; i < settings.length; i++) {
       newFileData[settings[i]] = newValues[i];
     }
+    newFileData["modifiedDate"] = new Date(Date.now());
 
     updateFileDB(file, newFileData);
     if (updateState)
@@ -169,6 +192,7 @@ const Editor = () => {
     foundObject[property] = newValue;
 
     updateObjectDB(foundObject, uid);
+    updateFileModifiedDate();
     if (updateState)
     {
       _activeObjects[foundIndex] = foundObject;
@@ -192,6 +216,7 @@ const Editor = () => {
     console.log(foundObject);
     
     updateObjectDB(foundObject, uid);
+    updateFileModifiedDate();
     if (updateState)
     {
       _activeObjects[foundIndex] = foundObject;

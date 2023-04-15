@@ -38,9 +38,9 @@ function compareByDateModified(a, b) {
 }
 
 function compareByFileName(a, b) {
-    if (a.fileName < b.fileName)
+    if (a.name < b.name)
         return -1;
-    if (a.fileName > b.fileName)
+    if (a.name > b.name)
         return 1;
     return 0;
 }
@@ -63,15 +63,17 @@ const Saved = () => {
     const [sortType, setSortType] = useState((localStorage.sortType) ? JSON.parse(localStorage.sortType) : SortTypes.dateModified);
     const navigate = useNavigate();
 
+    
+
     React.useEffect(() => {
         const fileListPromise = getFiles();
 
         Promise.all([fileListPromise]).then(([fileListResponse]) => {
-            setFileList(fileListResponse.data);
+            setFileList(initialSort(fileListResponse.data));
         })
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const getFiles = async()  => {
+    const getFiles = async () => {
         return axios.get("http://localhost:8000/api/files/");
     };
 
@@ -84,25 +86,25 @@ const Saved = () => {
     const addFileAndOpen = async (fileObj) => {
         await axios.post(`http://localhost:8000/api/files/`, fileObj).then(() => {
             openFile(fileObj.fileID);
-    });
+        });
     };
 
     const updateFile = async (fileID, fileObj) => {
         axios.put(`http://localhost:8000/api/files/${fileID}/`, fileObj);
     };
 
-    const changeFileName = (fileID) => 
-    {      
+    const changeFileName = (fileID) => {
         let _fileList = [...fileList];
         let foundIndex = fileList.findIndex(file => file.fileID === fileID);
-        let foundFile = {..._fileList[foundIndex]};
+        let foundFile = { ..._fileList[foundIndex] };
 
         let newName = window.prompt("Enter a new name", foundFile.name)
         if (!newName)
-            newName = foundFile.name; 
+            newName = foundFile.name;
 
         foundFile.name = newName;
         _fileList[foundIndex] = foundFile;
+        _fileList = initialSort(_fileList);
         setFileList(_fileList);
         updateFile(fileID, foundFile);
     }
@@ -115,21 +117,43 @@ const Saved = () => {
             name: "Untitled",
             fileID: uid,
             modifiedDate: timestamp,
-            createDate: timestamp,   
+            createDate: timestamp,
         }
 
-        addFileAndOpen(fileObj);  
+        addFileAndOpen(fileObj);
     }
 
     const openFile = (fileID) => {
-        console.log(`Opening ${fileID}`)
         navigate(`/file/${fileID}`);
     }
 
-    const sortFiles = () => {
+    const sortFiles = (newSortType) => {
+        const _fileList = [...fileList];
+        var sortFunction;
+
+        switch (newSortType) {
+            case SortTypes.alphabetical:
+                sortFunction = compareByFileName;
+                break;
+            case SortTypes.dateModified:
+                sortFunction = compareByDateModified;
+                break;
+            case SortTypes.dateCreated:
+                sortFunction = compareByDateCreated;
+                break;
+            default:
+                sortFunction = compareByDateModified;
+                break;
+        }
+
+        _fileList.sort(sortFunction);
+        setFileList(_fileList);
+    }
+
+    const initialSort = (theFileList) => {
         console.log("sort");
 
-        const _fileList = [...fileList];
+        const _fileList = [...theFileList];
         var sortFunction;
 
         switch (sortType) {
@@ -148,24 +172,45 @@ const Saved = () => {
         }
 
         _fileList.sort(sortFunction);
-        console.log('sorted', _fileList);
-        setFileList(_fileList);
-        console.log('result', fileList);
+        return _fileList;
+    }
+
+    const handleSortChange = (e) =>
+    {
+        let newSortType = e.target.value;
+        localStorage.sortType = JSON.stringify(newSortType);
+        setSortType(newSortType);
+        sortFiles(newSortType)
     }
 
     return (
-        <div>
-            <button className="createNewFileButton" onClick={openNewFile}>Create New File</button>
-            <p>Your Designs</p>
+        <div className="saved-wrapper">
+            <div>
+                <button className="button-23" onClick={openNewFile}>Create New File</button> 
+            </div>
+
+            <div className="yourDesigns">
+                <form method="post">Sort By: 
+                    <select name='SortBy' onChange={handleSortChange} defaultValue={sortType}>
+                        <option value={SortTypes.alphabetical}>Alphabetical</option>
+                        <option value={SortTypes.dateCreated}>Date Created</option>
+                        <option value={SortTypes.dateModified}>Date Modified</option>
+                    </select>
+                </form>
+            </div>
+            
             <div className="designCardContainer">
                 {
                     fileList.map(f => (
                         <div className="designCard" key={f.fileID} id={f.fileID} onClick={() => openFile(f.fileID)}>
                             <p>{f.name}</p>
                             <p>last modified {formatDate(f.modifiedDate)}</p>
-                            <p>{f.fileID}</p>
-                            <button onClick={(e) => { e.stopPropagation(); removeFile(f.fileID); }}>X</button>
-                            <button onClick={(e) => { e.stopPropagation(); changeFileName(f.fileID); }}>Rename</button>
+                            {/* <p>{f.fileID}</p> */}
+                            <div className="fileButtons">
+                                <button className="button-16" onClick={(e) => { e.stopPropagation(); removeFile(f.fileID); }}>Delete</button>
+                                <button className="button-16" onClick={(e) => { e.stopPropagation(); changeFileName(f.fileID); }}>Rename</button>
+                            </div>
+
                         </div>
                     ))
                 }
