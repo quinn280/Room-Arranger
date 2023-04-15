@@ -3,14 +3,7 @@ import { useNavigate } from "react-router-dom";
 import './saved.css';
 import axios from 'axios';
 
-const defaultRoomDimensions = {
-    width: "168",
-    height: "144"
-}
-
 const SortTypes = Object.freeze({ alphabetical: "Alphabetical", dateCreated: "Date Created", dateModified: "Date Modified" }) // modes enum
-const Modes = Object.freeze({ room: "room", furnish: "furnish" }) // modes enum
-
 const generateUID = () => {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
 }

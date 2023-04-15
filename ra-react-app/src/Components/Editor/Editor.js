@@ -86,10 +86,6 @@ const Editor = () => {
   const roomWidthInputRef = useRef(null);
   const roomHeightInputRef = useRef(null);
 
-  const getStuff = () => {
-    
-  }
-
   React.useEffect(() => {
     const filePromise = getFileDB(file);
     const objectsPromise = getObjectsDB(file);
@@ -592,7 +588,7 @@ const Editor = () => {
     // schedule async callback
     setTimeout(() => {
       viewerRef.current.scrollTo(xScroll, yScroll);
-    }, 10);
+    }, 0);
   };
 
   const getZoomFitValue = (
@@ -611,7 +607,10 @@ const Editor = () => {
   const moveRoom = (x, y) => {
     const room = document.getElementById("room");
     room.style.transform = `translate(${x}px,${y}px)`;
-    boxRef.current.updateRect();
+
+    setTimeout(() => {
+      boxRef.current.updateRect();
+    }, 0);  
   };
 
   const updateObjectStorage = (e) => {
