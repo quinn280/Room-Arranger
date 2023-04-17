@@ -1,10 +1,9 @@
 def returnSomeStuff(furniture_data):
     width = furniture_data['width']
-    print(f"The width is {width}")
+    #print(f"The width is {width}")
     
     wayfair_search = "https://www.wayfair.com/keyword.php?keyword="
     ikea_search = "https://www.ikea.com/us/en/search/?q="
-    
     amazon_search = "https://www.amazon.com/s?k="
 
     search = furniture_data['description'] + " " + str(furniture_data['width']) + " by " + str(furniture_data['height'])
