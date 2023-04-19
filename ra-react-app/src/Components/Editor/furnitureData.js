@@ -1,16 +1,16 @@
 const furnitureData = [
     {
       itemKey: 1,
-      url: "vectors/furniture/bed.svg",
+      url: "vectors/furniture/doublepillowbed.png",
       defaultWidth: 80,
       defaultHeight: 80,
-      description: "Full Bed",
+      description: "Queen Bed",
       category: "Bed",
       type: "furniture",
     },
     {
       itemKey: 2,
-      url: "vectors/furniture/desk.svg",
+      url: "vectors/furniture/singlepillowbed.png",
       defaultWidth: 84,
       defaultHeight: 64,
       description: "L Desk",
@@ -119,7 +119,7 @@ const furnitureData = [
     {
       itemKey: 15,
       url: "vectors/furniture/minifridge.svg",
-      defaultWidth: 40,
+      defaultWidth: 80,
       defaultHeight: 40,
       description: "Fridge",
       category: "Fridge",
