@@ -8,6 +8,7 @@ import './home.css';
 import furnitureList from "./furnitureData.js";
 import structureList from "./structureData.js"
 
+const vectorsPath = `${process.env.PUBLIC_URL}/vectors/`
 const fengShuiAPIURL = "http://127.0.0.1:8000/testpost/";
 const furnRecAPIURL = "http://127.0.0.1:8000/furnRec/";
 const inchPixelRatio = 3;
@@ -557,7 +558,7 @@ const Home = () => {
               structureList.map((f) => (
                 <div className="card structure" key={f.itemKey} data-key={f.itemKey} onClick={() => handleAdd(f.itemKey)}>
                   <div className="image-container">
-                    <img src={f.url} alt={f.description} draggable="false" />
+                    <img src={`${vectorsPath}${f.url}`} alt={f.description} draggable="false" />
                   </div>
                   <div className="description">{f.description}</div>
                 </div>
@@ -566,7 +567,7 @@ const Home = () => {
               furnitureList.map((f) => (
                 <div className="card furniture" key={f.itemKey} data-key={f.itemKey} onClick={() => handleAdd(f.itemKey)}>
                   <div className="image-container">
-                    <img src={f.url} alt={f.description} draggable="false" />
+                    <img src={`${vectorsPath}${f.url}`} alt={f.description} draggable="false" />
                   </div>
                   <div className="description">{f.description}</div>
                 </div>
@@ -587,7 +588,7 @@ const Home = () => {
               {activeObjects.map((f) => (
                 <img
                   draggable="false"
-                  src={f.url}
+                  src={`${vectorsPath}${f.url}`}
                   key={f.uid}
                   data-key={f.uid}
                   id={f.uid}

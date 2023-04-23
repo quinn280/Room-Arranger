@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from .serializers import DesignFileSerializer, RoomObjectSerializer
 from .models import DesignFile, RoomObject
 
+from .thumbnail_generator import *
+
 
 @api_view(['GET', 'POST'])
 def file_list(request):
@@ -92,4 +94,14 @@ def ro_create(request):
 
     return Response("object added")
 
+
+#####
+
+
+@api_view(['GET'])
+def get_thumbnail(request, fID):
+    file = DesignFile.objects.get(fileID=fID)
+    roomObjects = RoomObject.objects.all().filter(fileID=fID)
+    tb_b64 = generate_thumbnail(825, 495, file.width, file.height, list(roomObjects))
+    return Response(tb_b64)
 

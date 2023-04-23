@@ -1,7 +1,7 @@
 const furnitureData = [
     {
       itemKey: 1,
-      url: "vectors/furniture/bed.svg",
+      url: "bed.svg",
       defaultWidth: 80,
       defaultHeight: 80,
       description: "Full Bed",
@@ -10,7 +10,7 @@ const furnitureData = [
     },
     {
       itemKey: 2,
-      url: "vectors/furniture/desk.svg",
+      url: "desk.svg",
       defaultWidth: 84,
       defaultHeight: 64,
       description: "L Desk",
@@ -19,7 +19,7 @@ const furnitureData = [
     },
     {
       itemKey: 3,
-      url: "vectors/furniture/bedsidetable.svg",
+      url: "bedsidetable.svg",
       defaultWidth: 20,
       defaultHeight: 20,
       description: "SideTable",
@@ -28,7 +28,7 @@ const furnitureData = [
     },
     {
       itemKey: 4,
-      url: "vectors/furniture/plant.svg",
+      url: "plant.svg",
       defaultWidth: 32,
       defaultHeight: 32,
       description: "Fern",
@@ -37,7 +37,7 @@ const furnitureData = [
     },
     {
       itemKey: 6,
-      url: "vectors/furniture/armchair.svg",
+      url: "armchair.svg",
       defaultWidth: 50,
       defaultHeight: 40,
       description: "Armchair",
@@ -46,7 +46,7 @@ const furnitureData = [
     },
     {
       itemKey: 7,
-      url: "vectors/furniture/beanbag.svg",
+      url: "beanbag.svg",
       defaultWidth: 40,
       defaultHeight: 40,
       description: "Bean Bag",
@@ -55,7 +55,7 @@ const furnitureData = [
     },
     {
       itemKey: 8,
-      url: "vectors/furniture/carpet.svg",
+      url: "carpet.svg",
       defaultWidth: 60,
       defaultHeight: 100,
       description: "Carpet",
@@ -64,7 +64,7 @@ const furnitureData = [
     },
     {
       itemKey: 9,
-      url: "vectors/furniture/chair.svg",
+      url: "chair.svg",
       defaultWidth: 46,
       defaultHeight: 46,
       description: "Chair",
@@ -73,7 +73,7 @@ const furnitureData = [
     },
     {
       itemKey: 10,
-      url: "vectors/furniture/deskchair.svg",
+      url: "deskchair.svg",
       defaultWidth: 40,
       defaultHeight: 48,
       description: "Desk Chair",
@@ -82,7 +82,7 @@ const furnitureData = [
     },
     {
       itemKey: 11,
-      url: "vectors/furniture/diningtable.svg",
+      url: "diningtable.svg",
       defaultWidth: 94,
       defaultHeight: 66,
       description: "Dining",
@@ -91,7 +91,7 @@ const furnitureData = [
     },
     {
       itemKey: 12,
-      url: "vectors/furniture/lamp.svg",
+      url: "lamp.svg",
       defaultWidth: 32,
       defaultHeight: 32,
       description: "Lamp",
@@ -100,7 +100,7 @@ const furnitureData = [
     },
     {
       itemKey: 13,
-      url: "vectors/furniture/lcouch.svg",
+      url: "lcouch.svg",
       defaultWidth: 94,
       defaultHeight: 65,
       description: "Couch",
@@ -109,7 +109,7 @@ const furnitureData = [
     },
     {
       itemKey: 14,
-      url: "vectors/furniture/leaf.svg",
+      url: "leaf.svg",
       defaultWidth: 32,
       defaultHeight: 32,
       description: "Plant",
@@ -118,7 +118,7 @@ const furnitureData = [
     },
     {
       itemKey: 15,
-      url: "vectors/furniture/minifridge.svg",
+      url: "minifridge.svg",
       defaultWidth: 40,
       defaultHeight: 40,
       description: "Fridge",
@@ -127,7 +127,7 @@ const furnitureData = [
     },
     {
       itemKey: 16,
-      url: "vectors/furniture/tvstand.svg",
+      url: "tvstand.svg",
       defaultWidth: 111,
       defaultHeight: 28,
       description: "TV Stand",
@@ -136,7 +136,7 @@ const furnitureData = [
     },
     {
       itemKey: 17,
-      url: "vectors/furniture/twinbed.svg",
+      url: "twinbed.svg",
       defaultWidth: 80,
       defaultHeight: 46,
       description: "Twin Bed",
@@ -145,7 +145,7 @@ const furnitureData = [
     },
     {
       itemKey: 18,
-      url: "vectors/furniture/capybara.png",
+      url: "capybara.png",
       defaultWidth: 72,
       defaultHeight: 56,
       description: "Capybara",
@@ -154,7 +154,7 @@ const furnitureData = [
     },
     {
       itemKey: 19,
-      url: "vectors/furniture/duck.png",
+      url: "duck.png",
       defaultWidth: 50,
       defaultHeight: 50,
       description: "Duck",

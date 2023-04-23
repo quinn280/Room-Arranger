@@ -1,10 +1,8 @@
 .designCard {
-    width: 210px;
-    height: 150px;
-    padding: 1em;
+    width: 275px;
+    height: 225px;
     background-color: white;
     display: flex;
-    align-items: center;
     border-style: groove;
     border-width: 2px;
     flex-direction: column;
@@ -22,17 +20,18 @@
     color: #3c4043;
     cursor: pointer;
     font-family: arial,sans-serif;
-    font-size: 14px;
-    height: 36px;
+    font-size: 12px;
+    height: 24px;
     line-height: 27px;
     min-width: 54px;
-    padding: 0 16px;
+    padding: 0 12px;
     text-align: center;
     user-select: none;
     -webkit-user-select: none;
     touch-action: manipulation;
     white-space: pre;
-    margin: 10px;
+    margin: 2px;
+    margin-left: 5px;
   }
   
   .button-16:hover {
@@ -105,4 +104,30 @@
 
   .saved-wrapper {
     margin: 20px 30px;
+  }
+
+  .thumbnail-image, .loading-space {
+    width: 275px;
+    height: 165px;
+  }
+
+  h3 {
+    margin: .3em;
+    font-family: sans-serif;
+  }
+
+  p {
+    margin: .3em;
+    font-family: sans-serif;
+  }
+
+  .fileButtons {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .file-info {
+    height: 60px;
+    display: flex;
+    justify-content: space-between;
   }

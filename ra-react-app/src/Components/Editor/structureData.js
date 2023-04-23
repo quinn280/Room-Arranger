@@ -1,7 +1,7 @@
 const structureData = [
     {
       itemKey: 50,
-      url: "vectors/structural/leftdoorrotated.svg",
+      url: "leftdoorrotated.svg",
       defaultWidth: 40,
       defaultHeight: 40,
       description: "Left Door",
@@ -10,7 +10,7 @@ const structureData = [
     },
     {
       itemKey: 51,
-      url: "vectors/structural/rightdoorrotated.svg",
+      url: "rightdoorrotated.svg",
       defaultWidth: 40,
       defaultHeight: 40,
       description: "Right Door",
@@ -19,7 +19,7 @@ const structureData = [
     },
     {
       itemKey: 52,
-      url: "vectors/structural/window.png",
+      url: "window.png",
       defaultWidth: 4,
       defaultHeight: 40,
       description: "Window",
