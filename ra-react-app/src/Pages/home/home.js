@@ -5,10 +5,12 @@ import InfiniteViewer from "react-infinite-viewer";
 import { flushSync } from "react-dom";
 import axios from 'axios';
 import './home.css';
-import furnitureList from "./furnitureData.js";
-import structureList from "./structureData.js"
+import objectList from "Data/objectData.js";
 
-const vectorsPath = `${process.env.PUBLIC_URL}/vectors/`
+const furnitureList = objectList.filter(o => o.type === "furniture");
+const structureList = objectList.filter(o => o.type === "structural");
+
+const objectsPath = `${process.env.PUBLIC_URL}/objects/`
 const fengShuiAPIURL = "http://127.0.0.1:8000/testpost/";
 const furnRecAPIURL = "http://127.0.0.1:8000/furnRec/";
 const inchPixelRatio = 3;
@@ -558,7 +560,7 @@ const Home = () => {
               structureList.map((f) => (
                 <div className="card structure" key={f.itemKey} data-key={f.itemKey} onClick={() => handleAdd(f.itemKey)}>
                   <div className="image-container">
-                    <img src={`${vectorsPath}${f.url}`} alt={f.description} draggable="false" />
+                    <img src={`${objectsPath}${f.url}`} alt={f.description} draggable="false" />
                   </div>
                   <div className="description">{f.description}</div>
                 </div>
@@ -567,7 +569,7 @@ const Home = () => {
               furnitureList.map((f) => (
                 <div className="card furniture" key={f.itemKey} data-key={f.itemKey} onClick={() => handleAdd(f.itemKey)}>
                   <div className="image-container">
-                    <img src={`${vectorsPath}${f.url}`} alt={f.description} draggable="false" />
+                    <img src={`${objectsPath}${f.url}`} alt={f.description} draggable="false" />
                   </div>
                   <div className="description">{f.description}</div>
                 </div>
@@ -588,7 +590,7 @@ const Home = () => {
               {activeObjects.map((f) => (
                 <img
                   draggable="false"
-                  src={`${vectorsPath}${f.url}`}
+                  src={`${objectsPath}${f.url}`}
                   key={f.uid}
                   data-key={f.uid}
                   id={f.uid}
