@@ -14,7 +14,7 @@ Rounded to a 100th
 """
 
 import math
-
+"""
 def rectangle_corners(x1, y1, length, width, angle):
     angle_rad = math.radians(angle-90)
     cos_val = math.cos(angle_rad)
@@ -27,7 +27,33 @@ def rectangle_corners(x1, y1, length, width, angle):
     y4 = y1 - sin_val * width
     return [(round(x1,2), round(y1,2)), (round(x2,2), round(y2,2)), 
           (round(x3,2), round(y3,2)), (round(x4,2), round(y4,2))]
+"""
+def rectangle_corners(x1, y1, width, length, angle):
+  LeftCorner = (x1, y1)
+  Phi = math.radians(angle)
+  x2 = (x1 + width/2 * math.cos(Phi) - length/2 * math.sin(Phi))
+  y2 = (y1 + length/2 * math.cos(Phi) + length/2 * math.cos(Phi))
 
+  print(LeftCorner, (x2, y2))
+  
+  tr_x = cx + width/2 * math.cos(Phi) - length/2 * math.sin(Phi)
+  tr_y = cy + width/2 * math.sin(Phi) + length/2 * math.cos(Phi)
+
+  Phi = math.radians(angle+90)
+  br_x = cx + width/2 * math.cos(Phi) - length/2 * math.sin(Phi)
+  br_y = cy + width/2 * math.sin(Phi) + length/2 * math.cos(Phi)
+
+  Phi = math.radians(angle+90)
+  br_x = cx + width/2 * math.cos(Phi) - length/2 * math.sin(Phi)
+  br_y = cy + width/2 * math.sin(Phi) + length/2 * math.cos(Phi)
+
+
+
+
+
+  
+
+  return [LeftCorner]
 
 """
 Returns json with following parameters
