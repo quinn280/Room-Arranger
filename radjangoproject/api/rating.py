@@ -29,6 +29,8 @@ def rectangle_corners(x1, y1, length, width, angle):
           (round(x3,2), round(y3,2)), (round(x4,2), round(y4,2))]
 """
 def rectangle_corners(x1, y1, width, length, angle):
+  return [(1,2), (2,3), (4,5), (5,4)]
+"""
   LeftCorner = (x1, y1)
   Phi = math.radians(angle)
   x2 = (x1 + width/2 * math.cos(Phi) - length/2 * math.sin(Phi))
@@ -54,6 +56,31 @@ def rectangle_corners(x1, y1, width, length, angle):
   
 
   return [LeftCorner]
+"""
+
+"""
+checks if object1 is facing the same direction (angle) as object 2 with some degree of tolerance
+"""
+
+def same_direction(_object1, _object2, tolerance):
+  rotMin = (_object2 - tolerance) % 360
+  rotMax = (_object2 + tolerance) % 360
+
+  _object1 = (_object1 % 360)
+
+  if rotMin <= rotMax:
+    return (rotMin <= _object1 <= rotMax)
+  else:
+    return (_object1 >= rotMin or _object1<= rotMax)
+
+
+def atan2test(originX, originY, x2, y2):
+  feedY = (originY - y2)
+  feedX = (x2 - originX)
+  degreeBetweenPoints =  math.degrees(math.atan2(feedY, feedX))
+  return degreeBetweenPoints + 90
+
+
 
 """
 Returns json with following parameters
@@ -87,37 +114,39 @@ def getSideTables(_furniture):
       vectorReturn.append(i)
   return vectorReturn
 
-"""
-checks if object1 is facing the same direction as object 2 with some degree of tolerance
-"""
-def same_direction(_object1, _object2, tolerance):
-  rotMin = (_object2 - tolerance) % 360
-  rotMax = (_object2 + tolerance) % 360
-  if rotMin <= rotMax:
-    return (rotMin <= _object1 <= rotMax)
-  else:
-    return _object1 >= rotMin or _object1<= rotMax
+
     
 """
 This function checks if bed is not in line of site of the door
 """
 def doorAndBedCheck(_door, _bed, room, jsonData):
   if _door and _bed:
-    roomWidth = int(room['roomDimensions']['width'])
-    roomHeight = int(room['roomDimensions']['height'])
-    _bedCoordinates = rectangle_corners(_bed['x'],_bed['y'], _bed['width'], _bed['height'] / 2, _bed['rotate'])
-    _doorCollision = rectangle_corners(_door['x'],_door['y'],_door['width'], max(roomWidth, roomHeight), _door['rotate'])
+    #roomWidth = int(room['roomDimensions']['width'])
+    #roomHeight = int(room['roomDimensions']['height'])
+    #_bedCoordinates = rectangle_corners(_bed['x'],_bed['y'], _bed['width'], _bed['height'] / 2, _bed['rotate'])
+    #_doorCollision = rectangle_corners(_door['x'],_door['y'],_door['width'], max(roomWidth, roomHeight), _door['rotate'])
 
-    jsonData['DEBUG']['bedCoord'] = _bedCoordinates
-    jsonData['DEBUG']['doorCoord'] = _doorCollision
+    degreeBetween = atan2test(_door['x'], _door['y'], _bed['x'], _bed['y'])
+    #gives waring if door is not facing the same general direction as the bed 
 
-    separateAxis = separating_axis_theorem(_bedCoordinates, _doorCollision)
+    if((not same_direction(degreeBetween, _door['rotate'], 55) 
+       and not same_direction(degreeBetween, _door['rotate']+180, 55))):
+        jsonData['complaints'].append('Try to make sure that your bed is facing the general direction towards your bed')
+        return jsonData
+    #elif ((same_direction(door, _door['rotate'], 5) 
+     #  or same_direction(degreeBetween, _door['rotate']+180, 5))):
+
+
+    ##jsonData['DEBUG']['bedCoord'] = _bedCoordinates
+    ##jsonData['DEBUG']['doorCoord'] = _doorCollision
+
+    #separateAxis = separating_axis_theorem(_bedCoordinates, _doorCollision)
     
-    if separateAxis:
-      jsonData['complaints'].append('Move your bed out of line of the doorway')
-      jsonData['rating'] -= 50
+    #if separateAxis:
+      #jsonData['complaints'].append('Move your bed out of line of the doorway')
+      #jsonData['rating'] -= 50
 
-    jsonData['DEBUG']['bedOutOfLine'] = separateAxis
+    #jsonData['DEBUG']['bedOutOfLine'] = separateAxis
   elif _door and not _bed:
     jsonData['complaints'].append('Consider adding a bed to your room')
     jsonData['rating'] -= 90
@@ -200,6 +229,7 @@ def roomRate(roomData):
   
   
   returnJSON['rating'] = max(returnJSON['rating'], 0)
+  returnJSON['testing'] = atan2test(_door['x'], _door['y'], _bed['x'], _bed['y'])
   #return _doorCollision
   return json.dumps(returnJSON)
 
