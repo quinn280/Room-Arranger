@@ -120,19 +120,43 @@ def getSideTables(_furniture):
 This function checks if bed is not in line of site of the door
 """
 def doorAndBedCheck(_door, _bed, room, jsonData):
-  if _door and _bed:
-    #roomWidth = int(room['roomDimensions']['width'])
-    #roomHeight = int(room['roomDimensions']['height'])
-    #_bedCoordinates = rectangle_corners(_bed['x'],_bed['y'], _bed['width'], _bed['height'] / 2, _bed['rotate'])
-    #_doorCollision = rectangle_corners(_door['x'],_door['y'],_door['width'], max(roomWidth, roomHeight), _door['rotate'])
 
-    degreeBetween = atan2test(_door['x'], _door['y'], _bed['x'], _bed['y'])
-    #gives waring if door is not facing the same general direction as the bed 
+  if not _door: 
+    jsonData['complaints'].append('Add a door to your room to score your Feng Shui')
+    jsonData['rating'] = 0
+    jsonData['DEBUG']['DOOR_PRESENT'] = False
+    return jsonData
+  elif not _bed:
+    jsonData['complaints'].append('Consider adding a bed to your bedroom')
+    jsonData['rating'] = 0
+    jsonData['DEBUG']['BED_PRESENT'] = False
+    return jsonData
+  
+  jsonData['DEBUG']['DOOR_PRESENT'] = True
+  jsonData['DEBUG']['BED_PRESENT'] = True
 
-    if((not same_direction(degreeBetween, _door['rotate'], 55) 
-       and not same_direction(degreeBetween, _door['rotate']+180, 55))):
-        jsonData['complaints'].append('Try to make sure that your bed is facing the general direction towards your bed')
-        return jsonData
+
+  doorX = _door['x']# + (_door['width']/2)
+  doorY = _door['y']# + (_door['length']/2)
+  degreeBetween = atan2test(doorX, doorY, _bed['x'], _bed['y'])
+  #gives waring if door is not facing the same general direction as the bed 
+
+  if((not same_direction(degreeBetween, _door['rotate'], 60) and not same_direction(degreeBetween, _door['rotate']+180, 60))):
+    jsonData['complaints'].append('Move your bed so it is in view of your doorway')
+    jsonData['rating'] - 30
+    jsonData['DEBUG']['DOOR_IN_VIEW_OF_BED'] = False
+    return jsonData
+  else:
+    jsonData['DEBUG']['DOOR_IN_VIEW_OF_BED'] = True
+
+  if((same_direction(degreeBetween, _bed['rotate'], 10) or same_direction(degreeBetween, _bed['rotate'], 10))):
+    jsonData['complaints'].append('Your bed may have a direct view of the door')
+    jsonData['rating'] - 20
+    jsonData['DEBUG']['BED_DIRECTLY_DOOR'] = True
+  else:
+    jsonData['DEBUG']['BED_DIRECTLY_DOOR'] = False
+    
+  return jsonData
     #elif ((same_direction(door, _door['rotate'], 5) 
      #  or same_direction(degreeBetween, _door['rotate']+180, 5))):
 
@@ -147,14 +171,7 @@ def doorAndBedCheck(_door, _bed, room, jsonData):
       #jsonData['rating'] -= 50
 
     #jsonData['DEBUG']['bedOutOfLine'] = separateAxis
-  elif _door and not _bed:
-    jsonData['complaints'].append('Consider adding a bed to your room')
-    jsonData['rating'] -= 90
-  else:
-    jsonData['complaints'].append('Add a door to your room to score your Feng Shui')
-    jsonData['rating'] = 0
   
-  return jsonData
 
 
   
