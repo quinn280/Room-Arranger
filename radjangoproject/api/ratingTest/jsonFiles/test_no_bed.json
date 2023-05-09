@@ -1,0 +1,6 @@
+{"roomDimensions": {"width": 279, "height": 176
+    }, "activeObjects": [
+        {"itemKey": 50, "url": "vectors/structural/leftdoorrotated.svg", "defaultWidth": 40, "defaultHeight": 40, "description": "Left Door", "category": "door", "type": "structural", "uid": "lhfng2v5xvm6xyvjnys", "z": 1, "width": 40, "height": 40, "rotate": 0, "x": 119.5, "y": 68
+        }
+    ]
+}

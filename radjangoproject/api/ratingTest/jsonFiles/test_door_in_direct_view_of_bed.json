@@ -1,0 +1,40 @@
+{
+    "roomDimensions": {
+        "width": 279,
+        "height": 176
+    },
+    "activeObjects": [
+        {
+            "itemKey": 50,
+            "url": "vectors/structural/leftdoorrotated.svg",
+            "defaultWidth": 40,
+            "defaultHeight": 40,
+            "description": "Left Door",
+            "category": "door",
+            "type": "structural",
+            "uid": "lhfng2v5xvm6xyvjnys",
+            "z": 1,
+            "width": 40,
+            "height": 40,
+            "rotate": 180,
+            "x": 122.73,
+            "y": 105.88
+        },
+        {
+            "itemKey": 1,
+            "url": "vectors/furniture/bed.svg",
+            "defaultWidth": 80,
+            "defaultHeight": 80,
+            "description": "Full Bed",
+            "category": "Bed",
+            "type": "furniture",
+            "uid": "lhfnmq5eirm2dye729",
+            "z": 2,
+            "width": 80,
+            "height": 80,
+            "rotate": 0,
+            "x": 121.31,
+            "y": -0.25
+        }
+    ]
+}
