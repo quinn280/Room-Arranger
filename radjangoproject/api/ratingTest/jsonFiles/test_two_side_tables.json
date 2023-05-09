@@ -1,0 +1,72 @@
+{
+    "roomDimensions": {
+        "width": 279,
+        "height": 176
+    },
+    "activeObjects": [
+        {
+            "itemKey": 50,
+            "url": "vectors/structural/leftdoorrotated.svg",
+            "defaultWidth": 40,
+            "defaultHeight": 40,
+            "description": "Left Door",
+            "category": "door",
+            "type": "structural",
+            "uid": "lhfng2v5xvm6xyvjnys",
+            "z": 1,
+            "width": 40,
+            "height": 40,
+            "rotate": 180,
+            "x": -2.6367,
+            "y": 137.30033333333333
+        },
+        {
+            "itemKey": 1,
+            "url": "vectors/furniture/bed.svg",
+            "defaultWidth": 80,
+            "defaultHeight": 80,
+            "description": "Full Bed",
+            "category": "Bed",
+            "type": "furniture",
+            "uid": "lhfnmq5eirm2dye729",
+            "z": 2,
+            "width": 80,
+            "height": 80,
+            "rotate": 0,
+            "x": 121.31099999999999,
+            "y": -0.2535806666666667
+        },
+        {
+            "itemKey": 3,
+            "url": "vectors/furniture/bedsidetable.svg",
+            "defaultWidth": 20,
+            "defaultHeight": 20,
+            "description": "SideTable",
+            "category": "SideTable",
+            "type": "furniture",
+            "uid": "lhfunmn38woqm3lwre7",
+            "z": 3,
+            "width": 20,
+            "height": 20,
+            "rotate": 0,
+            "x": 108.06733333333334,
+            "y": -0.39130333333333334
+        },
+        {
+            "itemKey": 3,
+            "url": "vectors/furniture/bedsidetable.svg",
+            "defaultWidth": 20,
+            "defaultHeight": 20,
+            "description": "SideTable",
+            "category": "SideTable",
+            "type": "furniture",
+            "uid": "lhfuo2tc7vzt0f29so7",
+            "z": 4,
+            "width": 20,
+            "height": 20,
+            "rotate": 0,
+            "x": 192.9176666666667,
+            "y": -0.39130333333333334
+        }
+    ]
+}

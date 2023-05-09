@@ -61,7 +61,7 @@ def getFirstDoor(_doors):
 
 def getBed(_furniture):
   for i in _furniture:
-    if i['category'] == 'Bed':
+    if i['category'] == "Bed":
       return i
   return 0
 
@@ -75,7 +75,7 @@ def getSideTables(_furniture):
 
     
 """
-This function checks if bed is not in line of site of the door
+This function checks if bed is not in line of sight of the door
 """
 def doorAndBedCheck(_door, _bed, room, jsonData):
 
@@ -83,10 +83,12 @@ def doorAndBedCheck(_door, _bed, room, jsonData):
     jsonData['complaints'].append('Add a door to your room to score your Feng Shui')
     jsonData['rating'] = 0
     jsonData['DEBUG']['DOOR_PRESENT'] = False
+    jsonData['DEBUG']['BED_PRESENT'] = False
     return jsonData
   elif not _bed:
     jsonData['complaints'].append('Consider adding a bed to your bedroom')
     jsonData['rating'] = 0
+    jsonData['DEBUG']['DOOR_PRESENT'] = True
     jsonData['DEBUG']['BED_PRESENT'] = False
     return jsonData
   
@@ -117,9 +119,9 @@ def doorAndBedCheck(_door, _bed, room, jsonData):
   return jsonData
 
 
-  
+"Checks if there are two side tables and checks if they are symmetrical and near the bed"
 def symetrySideTable(_sideTables, _bed, jsonData):
-  jsonData['DEBUG']['SIDE_TABLE_COUNT'] = 3
+  jsonData['DEBUG']['SIDE_TABLE_COUNT'] = len(_sideTables)
 
   if(len(_sideTables) >= 3):
     jsonData['complaints'].append('You should have only two side tables')
@@ -174,6 +176,7 @@ def roomRate(roomData):
 
   _door = getFirstDoor(roomData['activeObjects'])
   _bed = getBed(roomData['activeObjects'])
+
   _sideTables = getSideTables(roomData['activeObjects'])
   returnJSON = doorAndBedCheck(_door, _bed, roomData, returnJSON)
 
@@ -183,6 +186,7 @@ def roomRate(roomData):
 
   if(_sideTables == []):
     returnJSON['complaints'].append('Consider adding two side tables next to your bed')
+    returnJSON['DEBUG']['SIDE_TABLE_COUNT'] = 0
   else:
     returnJSON = symetrySideTable(_sideTables, _bed, returnJSON)
   
