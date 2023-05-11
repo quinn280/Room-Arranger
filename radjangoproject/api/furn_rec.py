@@ -36,7 +36,7 @@ furn("SODERHAMN","upholstery",400,"Corner section, Viarp beige/brown",39,32.625,
 
     for e in dat:
         if e.category ==c:
-            ret.append(e)i
+            ret.append(e)#i
             #webbrowser.open(e.link, new = 2)
 
     err = 100
