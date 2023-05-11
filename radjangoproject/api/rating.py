@@ -96,8 +96,8 @@ def doorAndBedCheck(_door, _bed, room, jsonData):
   jsonData['DEBUG']['BED_PRESENT'] = True
 
 
-  doorX = _door['x']# + (_door['width']/2)
-  doorY = _door['y']# + (_door['length']/2)
+  doorX = _door['x']
+  doorY = _door['y']
   degreeBetween = atan2test(doorX, doorY, _bed['x'], _bed['y'])
   #gives waring if door is not facing the same general direction as the bed 
 
@@ -136,11 +136,8 @@ def symetrySideTable(_sideTables, _bed, jsonData):
     _table2 = _sideTables[1]
 
     
-    # Width explanation
-    # - these coordinates will check if one table is within a certain distance to the other side table
-    # - that distance is similar to table 1 width + table 2 width + bed width, as it assumes that both tables will be
-    #   somewhere in that range if it conforms to feng shui princaples
-    # - This will also give the user some leeway on where the side tables are in case it the tables are not aligned exactly
+    # Complains if tables are not close enough to each other
+    
 
     minX = _table2['x'] - 1.5*_bed['width']
     maxX = _table2['x'] + 1.5*_bed['width']
@@ -169,7 +166,6 @@ def roomRate(roomData):
   returnJSON = {}
   returnJSON['rating'] = 100
   returnJSON['complaints'] = []
-  returnJSON['compliments'] = []
   returnJSON['DEBUG'] = {}
 
 

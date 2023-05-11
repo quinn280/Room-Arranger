@@ -335,7 +335,7 @@ const Home = () => {
     axios.post(fengShuiAPIURL, jsonObj)
       .then(response => {
         console.log(response.data);
-        const responseData = JSON.parse(response.data);
+        const responseData = response.data//JSON.parse(response.data);
         showFengShuiResults(responseData)    
       })
       .catch(error => {
