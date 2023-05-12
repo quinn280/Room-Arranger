@@ -1,6 +1,7 @@
-from ..rating import roomRate
+from .ratingTestPy import roomRate
 import json
-
+# Actual rating.py was not functioning due to json dump, 
+# ratingTestPy fixes this
 def test_smoke():
     assert 1 == 1
 
@@ -58,3 +59,36 @@ def test_two_side_tables():
     actualDebug = returnJson['DEBUG']
     assert actualDebug['SIDE_TABLE_COUNT'] == 2
 
+def test_three_side_tables():
+    testJsonFile = open('jsonFiles/test_three_side_tables.json')
+    testJson = json.load(testJsonFile)
+    returnJsonStr = roomRate(testJson)
+    returnJson = json.loads(returnJsonStr)
+    actualDebug = returnJson['DEBUG']
+    assert actualDebug['SIDE_TABLE_COUNT'] == 3
+
+def test_side_tables_far_apart():
+    testJsonFile = open('jsonFiles/test_side_tables_far_apart.json')
+    testJson = json.load(testJsonFile)
+    returnJsonStr = roomRate(testJson)
+    returnJson = json.loads(returnJsonStr)
+    actualDebug = returnJson['DEBUG']
+    assert actualDebug['SIDE_NEAR_EACH_OTHER'] == False
+
+def test_side_tables_not_symmetrical():
+    testJsonFile = open('jsonFiles/test_side_tables_not_symmetrical.json')
+    testJson = json.load(testJsonFile)
+    returnJsonStr = roomRate(testJson)
+    returnJson = json.loads(returnJsonStr)
+    actualDebug = returnJson['DEBUG']
+    assert actualDebug['SIDE_SYMETRICAL'] == False
+
+# Sad tests
+
+def test_angled_door_facing_bed():
+    testJsonFile = open('jsonFiles/test_angled_door_facing_bed.json')
+    testJson = json.load(testJsonFile)
+    returnJsonStr = roomRate(testJson)
+    returnJson = json.loads(returnJsonStr)
+    actualDebug = returnJson['DEBUG']
+    assert actualDebug['DOOR_IN_VIEW_OF_BED'] == True

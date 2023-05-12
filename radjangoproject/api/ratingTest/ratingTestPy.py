@@ -3,7 +3,7 @@ import sys
 import math
 # Ripped from https://github.com/JuantAldea/Separating-Axis-Theorem
 # Thanks Juan!
-from .separation_axis_theorem import *
+#from .separation_axis_theorem import *
 
 """
 Gets coordinates of the furnitures 4 corners given one corner,
@@ -191,7 +191,7 @@ def roomRate(roomData):
   returnJSON['rating'] = max(returnJSON['rating'], 0)
   #returnJSON['testing'] = atan2test(_door['x'], _door['y'], _bed['x'], _bed['y'])
   #return _doorCollision
-  return returnJSON#json.dumps(returnJSON)
+  return json.dumps(returnJSON)
 
 
 
