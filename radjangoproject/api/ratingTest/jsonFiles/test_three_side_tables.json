@@ -1,0 +1,88 @@
+{
+    "roomDimensions": {
+        "width": 279,
+        "height": 176
+    },
+    "activeObjects": [
+        {
+            "itemKey": 20,
+            "url": "rightdoor.png",
+            "defaultWidth": 32,
+            "defaultHeight": 32,
+            "description": "Right Door",
+            "category": "Door",
+            "type": "structural",
+            "uid": "lhis9gp49bwcy3byb8",
+            "z": 1,
+            "width": 32,
+            "height": 32,
+            "rotate": 175,
+            "x": 195.43200000000002,
+            "y": 142.17033333333333
+        },
+        {
+            "itemKey": 3,
+            "url": "nightstand.png",
+            "defaultWidth": 20,
+            "defaultHeight": 15,
+            "description": "Nightstand",
+            "category": "Nightstand",
+            "type": "furniture",
+            "uid": "lhisuthxayhqbopajj",
+            "z": 2,
+            "width": 54.333333333333336,
+            "height": 52.333333333333336,
+            "rotate": 0,
+            "x": 158.49733333333333,
+            "y": 29.993933333333334
+        },
+        {
+            "itemKey": 3,
+            "url": "nightstand.png",
+            "defaultWidth": 20,
+            "defaultHeight": 15,
+            "description": "Nightstand",
+            "category": "Nightstand",
+            "type": "furniture",
+            "uid": "lhit3dge79orkap5tz",
+            "z": 3,
+            "width": 66,
+            "height": 52.333333333333336,
+            "rotate": 0,
+            "x": 44.696666666666665,
+            "y": 29.070899999999998
+        },
+        {
+            "itemKey": 1,
+            "url": "doublepillowbed.png",
+            "defaultWidth": 60,
+            "defaultHeight": 80,
+            "description": "Queen Bed",
+            "category": "Bed",
+            "type": "furniture",
+            "uid": "lhit3qkb6g267vscalc",
+            "z": 4,
+            "width": 60,
+            "height": 80,
+            "rotate": 0,
+            "x": 106.76433333333334,
+            "y": 25.568166666666666
+        },
+        {
+            "itemKey": 3,
+            "url": "nightstand.png",
+            "defaultWidth": 20,
+            "defaultHeight": 15,
+            "description": "Nightstand",
+            "category": "Nightstand",
+            "type": "furniture",
+            "uid": "lhith3wyphd6cpuvm1i",
+            "z": 5,
+            "width": 20,
+            "height": 15,
+            "rotate": 0,
+            "x": 11.179033333333335,
+            "y": 26.771133333333335
+        }
+    ]
+}

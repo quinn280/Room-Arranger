@@ -1,0 +1,72 @@
+{
+    "roomDimensions": {
+        "width": 279,
+        "height": 176
+    },
+    "activeObjects": [
+        {
+            "itemKey": 20,
+            "url": "rightdoor.png",
+            "defaultWidth": 32,
+            "defaultHeight": 32,
+            "description": "Right Door",
+            "category": "Door",
+            "type": "structural",
+            "uid": "lhis9gp49bwcy3byb8",
+            "z": 1,
+            "width": 32,
+            "height": 32,
+            "rotate": 175,
+            "x": 195.43200000000002,
+            "y": 142.17033333333333
+        },
+        {
+            "itemKey": 3,
+            "url": "nightstand.png",
+            "defaultWidth": 20,
+            "defaultHeight": 15,
+            "description": "Nightstand",
+            "category": "Nightstand",
+            "type": "furniture",
+            "uid": "lhisuthxayhqbopajj",
+            "z": 2,
+            "width": 25,
+            "height": 25,
+            "rotate": 0,
+            "x": 247.265,
+            "y": 32.39906666666666
+        },
+        {
+            "itemKey": 3,
+            "url": "nightstand.png",
+            "defaultWidth": 20,
+            "defaultHeight": 15,
+            "description": "Nightstand",
+            "category": "Nightstand",
+            "type": "furniture",
+            "uid": "lhit3dge79orkap5tz",
+            "z": 3,
+            "width": 25,
+            "height": 25,
+            "rotate": 0,
+            "x": 44.699999999999996,
+            "y": 29.099999999999998
+        },
+        {
+            "itemKey": 1,
+            "url": "doublepillowbed.png",
+            "defaultWidth": 60,
+            "defaultHeight": 80,
+            "description": "Queen Bed",
+            "category": "Bed",
+            "type": "furniture",
+            "uid": "lhit3qkb6g267vscalc",
+            "z": 4,
+            "width": 60,
+            "height": 80,
+            "rotate": 0,
+            "x": 106.76433333333334,
+            "y": 25.568166666666666
+        }
+    ]
+}
