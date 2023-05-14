@@ -61,7 +61,7 @@ def getFirstDoor(_doors):
 
 def getBed(_furniture):
   for i in _furniture:
-    if i['category'] == "Bed":
+    if i['category'] == "Bed" or i['category'] == "Beds":
       return i
   return 0
 
