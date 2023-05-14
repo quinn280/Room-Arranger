@@ -1,7 +1,7 @@
 const objectData = [
     {
         itemKey: 1,
-        url: "vectors/furniture/greyqueenbed.PNG",
+        url: "greyqueenbed.PNG",
         defaultWidth: 60,
         defaultHeight: 80,
         description: "Queen Bed",
@@ -10,7 +10,7 @@ const objectData = [
       },
       {
         itemKey: 2,
-        url: "vectors/furniture/queenbedplussheets.PNG",
+        url: "queenbedplussheets.PNG",
         defaultWidth: 60,
         defaultHeight: 80,
         description: "Queen Bed",
@@ -19,7 +19,7 @@ const objectData = [
       },
       {
         itemKey: 3,
-        url: "vectors/furniture/doublebed.PNG",
+        url: "doublebed.PNG",
         defaultWidth: 38,
         defaultHeight: 75,
         description: "Twin Bed",
@@ -28,7 +28,7 @@ const objectData = [
       },
       {
         itemKey: 4,
-        url: "vectors/furniture/singlebed.PNG",
+        url: "singlebed.PNG",
         defaultWidth: 30,
         defaultHeight: 75,
         description: "Single Bed",
@@ -37,7 +37,7 @@ const objectData = [
       },
       {
         itemKey: 5,
-        url: "vectors/furniture/crib.PNG",
+        url: "crib.PNG",
         defaultWidth: 28,
         defaultHeight: 52,
         description: "Crib",
@@ -46,7 +46,7 @@ const objectData = [
       },
       {
         itemKey: 6,
-        url: "vectors/furniture/largedresser.PNG",
+        url: "largedresser.PNG",
         defaultWidth: 60,
         defaultHeight: 20,
         description: "Large Dresser",
@@ -55,7 +55,7 @@ const objectData = [
       },
       {
         itemKey: 7,
-        url: "vectors/furniture/mediumdresser.PNG",
+        url: "mediumdresser.PNG",
         defaultWidth: 50,
         defaultHeight: 20,
         description: "Medium Dresser",
@@ -64,7 +64,7 @@ const objectData = [
       },
       {
         itemKey: 8,
-        url: "vectors/furniture/rectangularbrownnightstand.PNG",
+        url: "rectangularbrownnightstand.PNG",
         defaultWidth: 30,
         defaultHeight: 20,
         description: "Nightstand",
@@ -73,7 +73,7 @@ const objectData = [
       },
       {
         itemKey: 9,
-        url: "vectors/furniture/rectangularwhitenightstand.PNG",
+        url: "rectangularwhitenightstand.PNG",
         defaultWidth: 20,
         defaultHeight: 30,
         description: "Nightstand",
@@ -82,7 +82,7 @@ const objectData = [
       },
       {
         itemKey: 10,
-        url: "vectors/furniture/squareblacknightstand.PNG",
+        url: "squareblacknightstand.PNG",
         defaultWidth: 25,
         defaultHeight: 25,
         description: "Nightstand",
@@ -91,7 +91,7 @@ const objectData = [
       },
       {
         itemKey: 11,
-        url: "vectors/furniture/squarebrownnightstand.PNG",
+        url: "squarebrownnightstand.PNG",
         defaultWidth: 30,
         defaultHeight: 20,
         description: "Nightstand",
@@ -100,7 +100,7 @@ const objectData = [
       },
       {
         itemKey: 12,
-        url: "vectors/furniture/squarewhitenightstand.PNG",
+        url: "squarewhitenightstand.PNG",
         defaultWidth: 30,
         defaultHeight: 20,
         description: "Nightstand",
@@ -109,7 +109,7 @@ const objectData = [
       },
       {
         itemKey: 13,
-        url: "vectors/furniture/cornershelves.PNG",
+        url: "cornershelves.PNG",
         defaultWidth: 24,
         defaultHeight: 24,
         description: "Corner Shelves",
@@ -118,7 +118,7 @@ const objectData = [
       },
       {
         itemKey: 14,
-        url: "vectors/furniture/cubbyshelf.PNG",
+        url: "cubbyshelf.PNG",
         defaultWidth: 36,
         defaultHeight: 20,
         description: "Cubby Shelf",
@@ -127,7 +127,7 @@ const objectData = [
       },
       {
         itemKey: 15,
-        url: "vectors/furniture/floorshelves.PNG",
+        url: "floorshelves.PNG",
         defaultWidth: 36,
         defaultHeight: 18,
         description: "Floor Shelves",
@@ -136,7 +136,7 @@ const objectData = [
       },
       {
         itemKey: 16,
-        url: "vectors/furniture/largeblackshelves.PNG",
+        url: "largeblackshelves.PNG",
         defaultWidth: 60,
         defaultHeight: 20,
         description: "Large Black Shelves",
@@ -145,7 +145,7 @@ const objectData = [
       },
       {
         itemKey: 17,
-        url: "vectors/furniture/largebrownshelves.PNG",
+        url: "largebrownshelves.PNG",
         defaultWidth: 60,
         defaultHeight: 20,
         description: "Large Brown Shelves",
@@ -154,7 +154,7 @@ const objectData = [
       },
       {
         itemKey: 18,
-        url: "vectors/furniture/mediumblackshelves.PNG",
+        url: "mediumblackshelves.PNG",
         defaultWidth: 50,
         defaultHeight: 20,
         description: "Medium Black Shelves",
@@ -163,7 +163,7 @@ const objectData = [
       },
       {
         itemKey: 19,
-        url: "vectors/furniture/shelfwithpictures.PNG",
+        url: "shelfwithpictures.PNG",
         defaultWidth: 60,
         defaultHeight: 20,
         description: "Decorated Shelf",
@@ -172,7 +172,7 @@ const objectData = [
       },
       {
         itemKey: 20,
-        url: "vectors/furniture/wireshelves.PNG",
+        url: "wireshelves.PNG",
         defaultWidth: 36,
         defaultHeight: 20,
         description: "Wire Shelves",
@@ -181,7 +181,7 @@ const objectData = [
       },
       {
         itemKey: 21,
-        url: "vectors/furniture/browntvstand.PNG",
+        url: "browntvstand.PNG",
         defaultWidth: 60,
         defaultHeight: 18,
         description: "Brown TV Stand",
@@ -190,7 +190,7 @@ const objectData = [
       },
       {
         itemKey: 22,
-        url: "vectors/furniture/greytvstand.PNG",
+        url: "greytvstand.PNG",
         defaultWidth: 50,
         defaultHeight: 18,
         description: "Grey TV Stand",
@@ -199,7 +199,7 @@ const objectData = [
       },
       {
         itemKey: 23,
-        url: "vectors/furniture/smalltvstand.PNG",
+        url: "smalltvstand.PNG",
         defaultWidth: 36,
         defaultHeight: 18,
         description: "Small TV Stand",
@@ -208,7 +208,7 @@ const objectData = [
       },
       {
         itemKey: 24,
-        url: "vectors/furniture/yellowtvstand.PNG",
+        url: "yellowtvstand.PNG",
         defaultWidth: 50,
         defaultHeight: 18,
         description: "Yellow TV Stand",
@@ -217,7 +217,7 @@ const objectData = [
       },
       {
         itemKey: 25,
-        url: "vectors/furniture/brownvanity.PNG",
+        url: "brownvanity.PNG",
         defaultWidth: 50,
         defaultHeight: 18,
         description: "Brown Vanity",
@@ -226,7 +226,7 @@ const objectData = [
       },
       {
         itemKey: 26,
-        url: "vectors/furniture/whitevanity.PNG",
+        url: "whitevanity.PNG",
         defaultWidth: 50,
         defaultHeight: 18,
         description: "White Vanity",
@@ -235,7 +235,7 @@ const objectData = [
       },
       {
         itemKey: 27,
-        url: "vectors/furniture/blackwardrobe.PNG",
+        url: "blackwardrobe.PNG",
         defaultWidth: 40,
         defaultHeight: 20,
         description: "Black Wardrobe",
@@ -244,7 +244,7 @@ const objectData = [
       },
       {
         itemKey: 28,
-        url: "vectors/furniture/brownwardrobe.PNG",
+        url: "brownwardrobe.PNG",
         defaultWidth: 40,
         defaultHeight: 20,
         description: "Brown Wardrobe",
@@ -253,7 +253,7 @@ const objectData = [
       },
       {
         itemKey: 29,
-        url: "vectors/furniture/smallblackwardrobe.PNG",
+        url: "smallblackwardrobe.PNG",
         defaultWidth: 30,
         defaultHeight: 20,
         description: "Small Black Wardrobe",
@@ -262,7 +262,7 @@ const objectData = [
       },
       {
         itemKey: 30,
-        url: "vectors/furniture/smallbrownwardrobe.PNG",
+        url: "smallbrownwardrobe.PNG",
         defaultWidth: 30,
         defaultHeight: 20,
         description: "Small Brown Wardrobe",
@@ -271,7 +271,7 @@ const objectData = [
       },
       {
         itemKey: 31,
-        url: "vectors/furniture/blackchair.PNG",
+        url: "blackchair.PNG",
         defaultWidth: 30,
         defaultHeight: 30,
         description: "Black Chair",
@@ -280,7 +280,7 @@ const objectData = [
       },
       {
         itemKey: 32,
-        url: "vectors/furniture/blackstool.PNG",
+        url: "blackstool.PNG",
         defaultWidth: 25,
         defaultHeight: 25,
         description: "Black Stool",
@@ -289,7 +289,7 @@ const objectData = [
       },
       {
         itemKey: 33,
-        url: "vectors/furniture/paddedchair.PNG",
+        url: "paddedchair.PNG",
         defaultWidth: 30,
         defaultHeight: 30,
         description: "Padded Chair",
@@ -298,7 +298,7 @@ const objectData = [
       },
       {
         itemKey: 34,
-        url: "vectors/furniture/whitechair.PNG",
+        url: "whitechair.PNG",
         defaultWidth: 30,
         defaultHeight: 30,
         description: "White Chair",
@@ -307,7 +307,7 @@ const objectData = [
       },
       {
         itemKey: 35,
-        url: "vectors/furniture/blackdesk.PNG",
+        url: "blackdesk.PNG",
         defaultWidth: 60,
         defaultHeight: 30,
         description: "Black Desk",
@@ -316,7 +316,7 @@ const objectData = [
       },
       {
         itemKey: 36,
-        url: "vectors/furniture/browndesk.PNG",
+        url: "browndesk.PNG",
         defaultWidth: 60,
         defaultHeight: 30,
         description: "Brown Desk",
@@ -325,7 +325,7 @@ const objectData = [
       },
       {
         itemKey: 37,
-        url: "vectors/furniture/officechair1.PNG",
+        url: "officechair1.PNG",
         defaultWidth: 35,
         defaultHeight: 35,
         description: "Officechair 1",
@@ -334,7 +334,7 @@ const objectData = [
       },
       {
         itemKey: 38,
-        url: "vectors/furniture/officechair2.PNG",
+        url: "officechair2.PNG",
         defaultWidth: 35,
         defaultHeight: 35,
         description: "Officechair 2",
@@ -343,7 +343,7 @@ const objectData = [
       },
       {
         itemKey: 39,
-        url: "vectors/furniture/officechair3.PNG",
+        url: "officechair3.PNG",
         defaultWidth: 35,
         defaultHeight: 35,
         description: "Officechair 3",
@@ -352,7 +352,7 @@ const objectData = [
       },
       {
         itemKey: 40,
-        url: "vectors/furniture/officechair4.PNG",
+        url: "officechair4.PNG",
         defaultWidth: 35,
         defaultHeight: 35,
         description: "Officechair 4",
@@ -361,7 +361,7 @@ const objectData = [
       },
       {
         itemKey: 41,
-        url: "vectors/furniture/officechair5.PNG",
+        url: "officechair5.PNG",
         defaultWidth: 35,
         defaultHeight: 35,
         description: "Officechair 5",
@@ -370,7 +370,7 @@ const objectData = [
       },
       {
         itemKey: 42,
-        url: "vectors/furniture/glasstable.PNG",
+        url: "glasstable.PNG",
         defaultWidth: 50,
         defaultHeight: 25,
         description: "Glass Table",
@@ -379,7 +379,7 @@ const objectData = [
       },
       {
         itemKey: 43,
-        url: "vectors/furniture/ovaltable.PNG",
+        url: "ovaltable.PNG",
         defaultWidth: 60,
         defaultHeight: 30,
         description: "Oval Table",
@@ -388,7 +388,7 @@ const objectData = [
       },
       {
         itemKey: 44,
-        url: "vectors/furniture/roundtable.PNG",
+        url: "roundtable.PNG",
         defaultWidth: 50,
         defaultHeight: 50,
         description: "Round Table",
@@ -397,7 +397,7 @@ const objectData = [
       },
       {
         itemKey: 45,
-        url: "vectors/furniture/tablewithchairs.PNG",
+        url: "tablewithchairs.PNG",
         defaultWidth: 70,
         defaultHeight: 40,
         description: "Dining Table",
@@ -406,7 +406,7 @@ const objectData = [
       },
       {
         itemKey: 46,
-        url: "vectors/furniture/whitetable.PNG",
+        url: "whitetable.PNG",
         defaultWidth: 50,
         defaultHeight: 30,
         description: "White Table",
@@ -415,7 +415,7 @@ const objectData = [
       },
       {
         itemKey: 47,
-        url: "vectors/furniture/greyarmchair.PNG",
+        url: "greyarmchair.PNG",
         defaultWidth: 35,
         defaultHeight: 35,
         description: "Grey Armchair",
@@ -424,7 +424,7 @@ const objectData = [
       },
       {
         itemKey: 48,
-        url: "vectors/furniture/largebluearmchair.PNG",
+        url: "largebluearmchair.PNG",
         defaultWidth: 35,
         defaultHeight: 35,
         description: "Blue Armchair",
@@ -433,7 +433,7 @@ const objectData = [
       },
       {
         itemKey: 49,
-        url: "vectors/furniture/mediumgreyarmchair.PNG",
+        url: "mediumgreyarmchair.PNG",
         defaultWidth: 35,
         defaultHeight: 35,
         description: "Rounded Grey Armchair",
@@ -442,7 +442,7 @@ const objectData = [
       },
       {
         itemKey: 50,
-        url: "vectors/furniture/roundarmchair.PNG",
+        url: "roundarmchair.PNG",
         defaultWidth: 35,
         defaultHeight: 30,
         description: "Round Armchair",
@@ -451,7 +451,7 @@ const objectData = [
       },
       {
         itemKey: 51,
-        url: "vectors/furniture/tallarmchair.PNG",
+        url: "tallarmchair.PNG",
         defaultWidth: 40,
         defaultHeight: 35,
         description: "Tall Armchair",
@@ -460,7 +460,7 @@ const objectData = [
       },
       {
         itemKey: 52,
-        url: "vectors/furniture/greysquareottoman.PNG",
+        url: "greysquareottoman.PNG",
         defaultWidth: 35,
         defaultHeight: 20,
         description: "Grey Ottoman",
@@ -469,7 +469,7 @@ const objectData = [
       },
       {
         itemKey: 53,
-        url: "vectors/furniture/leggedottoman.PNG",
+        url: "leggedottoman.PNG",
         defaultWidth: 35,
         defaultHeight: 35,
         description: "Legged Ottoman",
@@ -478,7 +478,7 @@ const objectData = [
       },
       {
         itemKey: 54,
-        url: "vectors/furniture/roundottoman.PNG",
+        url: "roundottoman.PNG",
         defaultWidth: 35,
         defaultHeight: 35,
         description: "Round Ottoman",
@@ -487,7 +487,7 @@ const objectData = [
       },
       {
         itemKey: 55,
-        url: "vectors/furniture/yellowsquareottoman.PNG",
+        url: "yellowsquareottoman.PNG",
         defaultWidth: 35,
         defaultHeight: 20,
         description: "Yellow Ottoman",
@@ -496,7 +496,7 @@ const objectData = [
       },
       {
         itemKey: 56,
-        url: "vectors/furniture/blacksofa.PNG",
+        url: "blacksofa.PNG",
         defaultWidth: 70,
         defaultHeight: 25,
         description: "Black Sofa",
@@ -505,7 +505,7 @@ const objectData = [
       },
       {
         itemKey: 57,
-        url: "vectors/furniture/greensofa.PNG",
+        url: "greensofa.PNG",
         defaultWidth: 70,
         defaultHeight: 25,
         description: "Green Sofa",
@@ -514,7 +514,7 @@ const objectData = [
       },
       {
         itemKey: 58,
-        url: "vectors/furniture/Lsofa.PNG",
+        url: "Lsofa.PNG",
         defaultWidth: 110,
         defaultHeight: 50,
         description: "Corner Sofa",
@@ -523,7 +523,7 @@ const objectData = [
       },
       {
         itemKey: 59,
-        url: "vectors/furniture/reclinersofa.PNG",
+        url: "reclinersofa.PNG",
         defaultWidth: 110,
         defaultHeight: 80,
         description: "Recliner Sofa",
@@ -532,7 +532,7 @@ const objectData = [
       },
       {
         itemKey: 60,
-        url: "vectors/furniture/roundedsofa.PNG",
+        url: "roundedsofa.PNG",
         defaultWidth: 70,
         defaultHeight: 25,
         description: "Rounded Sofa",
@@ -541,7 +541,7 @@ const objectData = [
       },
       {
         itemKey: 61,
-        url: "vectors/furniture/Usofa.PNG",
+        url: "Usofa.PNG",
         defaultWidth: 120,
         defaultHeight: 60,
         description: "U Sofa",
@@ -550,7 +550,7 @@ const objectData = [
       },
       {
         itemKey: 62,
-        url: "vectors/furniture/bedsidelamp.PNG",
+        url: "bedsidelamp.PNG",
         defaultWidth: 15,
         defaultHeight: 15,
         description: "Square Lamp",
@@ -559,7 +559,7 @@ const objectData = [
       },
       {
         itemKey: 63,
-        url: "vectors/furniture/desklamp.PNG",
+        url: "desklamp.PNG",
         defaultWidth: 15,
         defaultHeight: 24,
         description: "Desk Lamp",
@@ -568,7 +568,7 @@ const objectData = [
       },
       {
         itemKey: 64,
-        url: "vectors/furniture/floorlamp.PNG",
+        url: "floorlamp.PNG",
         defaultWidth: 25,
         defaultHeight: 25,
         description: "Floor Lamp",
@@ -577,7 +577,7 @@ const objectData = [
       },
       {
         itemKey: 65,
-        url: "vectors/furniture/roundbedsidelamp.PNG",
+        url: "roundbedsidelamp.PNG",
         defaultWidth: 15,
         defaultHeight: 15,
         description: "Round Lamp",
@@ -586,7 +586,7 @@ const objectData = [
       },
       {
         itemKey: 66,
-        url: "vectors/furniture/walllamp.PNG",
+        url: "walllamp.PNG",
         defaultWidth: 15,
         defaultHeight: 24,
         description: "Wall Lamp",
@@ -595,7 +595,7 @@ const objectData = [
       },
       {
         itemKey: 67,
-        url: "vectors/furniture/rug.PNG",
+        url: "rug.PNG",
         defaultWidth: 100,
         defaultHeight: 60,
         description: "Rug",
@@ -604,7 +604,7 @@ const objectData = [
       },
       {
         itemKey: 68,
-        url: "vectors/furniture/roses.PNG",
+        url: "roses.PNG",
         defaultWidth: 12,
         defaultHeight: 12,
         description: "Roses",
@@ -613,7 +613,7 @@ const objectData = [
       },
       {
         itemKey: 69,
-        url: "vectors/furniture/flowers.PNG",
+        url: "flowers.PNG",
         defaultWidth: 12,
         defaultHeight: 12,
         description: "Flowers",
@@ -622,7 +622,7 @@ const objectData = [
       },
       {
         itemKey: 70,
-        url: "vectors/furniture/plant.PNG",
+        url: "plant.PNG",
         defaultWidth: 12,
         defaultHeight: 12,
         description: "Fern",
@@ -631,7 +631,7 @@ const objectData = [
       },
       {
         itemKey: 71,
-        url: "vectors/furniture/books.PNG",
+        url: "books.PNG",
         defaultWidth: 12,
         defaultHeight: 6,
         description: "Books",
@@ -640,7 +640,7 @@ const objectData = [
       },
       {
         itemKey: 72,
-        url: "vectors/furniture/airconditioner.PNG",
+        url: "airconditioner.PNG",
         defaultWidth: 48,
         defaultHeight: 6,
         description: "Air Conditioner",
@@ -649,7 +649,7 @@ const objectData = [
       },
       {
         itemKey: 73,
-        url: "vectors/furniture/bicycle.PNG",
+        url: "bicycle.PNG",
         defaultWidth: 18,
         defaultHeight: 60,
         description: "Bicycle",
@@ -658,7 +658,7 @@ const objectData = [
       },
       {
         itemKey: 74,
-        url: "vectors/furniture/exercisebike.PNG",
+        url: "exercisebike.PNG",
         defaultWidth: 24,
         defaultHeight: 60,
         description: "Exercise Bike",
@@ -667,7 +667,7 @@ const objectData = [
       },
       {
         itemKey: 75,
-        url: "vectors/furniture/fan.PNG",
+        url: "fan.PNG",
         defaultWidth: 18,
         defaultHeight: 6,
         description: "Fan",
@@ -676,7 +676,7 @@ const objectData = [
       },
       {
         itemKey: 76,
-        url: "vectors/furniture/fridge.PNG",
+        url: "fridge.PNG",
         defaultWidth: 36,
         defaultHeight: 36,
         description: "Fridge",
@@ -685,7 +685,7 @@ const objectData = [
       },
       {
         itemKey: 77,
-        url: "vectors/furniture/ironingboard.PNG",
+        url: "ironingboard.PNG",
         defaultWidth: 48,
         defaultHeight: 12,
         description: "Ironing Board",
@@ -694,7 +694,7 @@ const objectData = [
       },
       {
         itemKey: 78,
-        url: "vectors/furniture/keyboard.PNG",
+        url: "keyboard.PNG",
         defaultWidth: 36,
         defaultHeight: 18,
         description: "Keyboard",
@@ -703,7 +703,7 @@ const objectData = [
       },
       {
         itemKey: 79,
-        url: "vectors/furniture/largetv.PNG",
+        url: "largetv.PNG",
         defaultWidth: 60,
         defaultHeight: 6,
         description: "Large TV",
@@ -712,7 +712,7 @@ const objectData = [
       },
       {
         itemKey: 80,
-        url: "vectors/furniture/mediumtv.PNG",
+        url: "mediumtv.PNG",
         defaultWidth: 36,
         defaultHeight: 6,
         description: "TV",
@@ -721,7 +721,7 @@ const objectData = [
       },
       {
         itemKey: 81,
-        url: "vectors/furniture/smalltv.PNG",
+        url: "smalltv.PNG",
         defaultWidth: 24,
         defaultHeight: 6,
         description: "Small TV",
@@ -730,7 +730,7 @@ const objectData = [
       },
       {
         itemKey: 82,
-        url: "vectors/furniture/piano.PNG",
+        url: "piano.PNG",
         defaultWidth: 40,
         defaultHeight: 15,
         description: "Piano",
@@ -739,7 +739,7 @@ const objectData = [
       },
       {
         itemKey: 83,
-        url: "vectors/furniture/projector.PNG",
+        url: "projector.PNG",
         defaultWidth: 18,
         defaultHeight: 18,
         description: "Projector",
@@ -748,7 +748,7 @@ const objectData = [
       },
       {
         itemKey: 84,
-        url: "vectors/furniture/pc.PNG",
+        url: "pc.PNG",
         defaultWidth: 24,
         defaultHeight: 18,
         description: "Computer",
@@ -757,7 +757,7 @@ const objectData = [
       },
       {
         itemKey: 85,
-        url: "vectors/furniture/speakerset.PNG",
+        url: "speakerset.PNG",
         defaultWidth: 24,
         defaultHeight: 10,
         description: "Speakers",
@@ -766,7 +766,7 @@ const objectData = [
       },
       {
         itemKey: 86,
-        url: "vectors/furniture/washingmachine.PNG",
+        url: "washingmachine.PNG",
         defaultWidth: 30,
         defaultHeight: 30,
         description: "Washing Machine",
@@ -775,7 +775,7 @@ const objectData = [
       },
       {
         itemKey: 87,
-        url: "vectors/furniture/capybara.png",
+        url: "capybara.png",
         defaultWidth: 15,
         defaultHeight: 15,
         description: "Capybara",
@@ -784,7 +784,7 @@ const objectData = [
       },
       {
         itemKey: 88,
-        url: "vectors/furniture/duck.png",
+        url: "duck.png",
         defaultWidth: 15,
         defaultHeight: 15,
         description: "Duck",
