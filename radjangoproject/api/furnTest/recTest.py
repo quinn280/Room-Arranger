@@ -1,5 +1,6 @@
+import json
+#import webbrowser
 
-import webbrowser
 
 class furn:
   def __init__(self, name, category, price, description, width, height, length, link, image):
@@ -83,7 +84,37 @@ def rec(furniture_data):
             "length":final.length, 
             "link":final.link, 
             "image":final.image }
-    webbrowser.open(final.link, new = 2)
+    
+    #webbrowser.open(final.link, new = 2)
 
     return r
+
     
+
+
+def test_smoke():
+    assert 1 == 1
+
+def test_queen_bed_big():
+    testJsonFile = open('jsonFiles/test_queen_bed_big.json')
+    testJson = json.load(testJsonFile)
+    returnJson = rec(testJson)
+    assert returnJson['name'] == 'MALM'
+
+def test_queen_bed_small():
+    testJsonFile = open('jsonFiles/test_queen_bed_small.json')
+    testJson = json.load(testJsonFile)
+    returnJson = rec(testJson)
+    assert returnJson['name'] == 'TARVA'
+
+def test_queen_bed_zero():
+    testJsonFile = open('jsonFiles/test_queen_bed_zero.json')
+    testJson = json.load(testJsonFile)
+    returnJson = rec(testJson)
+    assert returnJson['name'] == 'TARVA'
+
+def test_long_desk():
+    testJsonFile = open('jsonFiles/test_long_desk.json')
+    testJson = json.load(testJsonFile)
+    returnJson = rec(testJson)
+    assert returnJson['name'] == 'IDANAS'
