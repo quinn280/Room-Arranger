@@ -83,6 +83,22 @@ def test_side_tables_not_symmetrical():
     actualDebug = returnJson['DEBUG']
     assert actualDebug['SIDE_SYMETRICAL'] == False
 
+def test_everything_wrong_rating():
+    testJsonFile = open('jsonFiles/test_everything_wrong_rating.json')
+    testJson = json.load(testJsonFile)
+    returnJsonStr = roomRate(testJson)
+    returnJson = json.loads(returnJsonStr)
+    actualDebug = returnJson['rating']
+    assert actualDebug == 0
+
+def test_everything_right_rating():
+    testJsonFile = open('jsonFiles/test_everything_right_rating.json')
+    testJson = json.load(testJsonFile)
+    returnJsonStr = roomRate(testJson)
+    returnJson = json.loads(returnJsonStr)
+    actualDebug = returnJson['rating']
+    assert actualDebug == 100
+
 # Sad tests
 
 def test_angled_door_facing_bed():
@@ -92,3 +108,19 @@ def test_angled_door_facing_bed():
     returnJson = json.loads(returnJsonStr)
     actualDebug = returnJson['DEBUG']
     assert actualDebug['DOOR_IN_VIEW_OF_BED'] == True
+
+def test_impossibly_big_bed():
+    testJsonFile = open('jsonFiles/test_impossibly_big_bed.json')
+    testJson = json.load(testJsonFile)
+    returnJsonStr = roomRate(testJson)
+    returnJson = json.loads(returnJsonStr)
+    actualDebug = returnJson['DEBUG']
+    assert actualDebug['BED_DIRECTLY_DOOR'] == True
+
+def test_impossibly_wide_door():
+    testJsonFile = open('jsonFiles/test_impossibly_wide_door.json')
+    testJson = json.load(testJsonFile)
+    returnJsonStr = roomRate(testJson)
+    returnJson = json.loads(returnJsonStr)
+    actualDebug = returnJson['DEBUG']
+    assert actualDebug['BED_DIRECTLY_DOOR'] == True

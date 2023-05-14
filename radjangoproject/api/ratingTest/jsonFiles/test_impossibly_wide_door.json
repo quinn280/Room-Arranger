@@ -1,0 +1,40 @@
+{
+    "roomDimensions": {
+        "width": 279,
+        "height": 176
+    },
+    "activeObjects": [
+        {
+            "itemKey": 20,
+            "url": "rightdoor.png",
+            "defaultWidth": 32,
+            "defaultHeight": 32,
+            "description": "Right Door",
+            "category": "Door",
+            "type": "structural",
+            "uid": "lhis9gp49bwcy3byb8",
+            "z": 1,
+            "width": 168.66666666666666,
+            "height": 32,
+            "rotate": 90,
+            "x": 155.87300000000002,
+            "y": 73.50666666666667
+        },
+        {
+            "itemKey": 1,
+            "url": "doublepillowbed.png",
+            "defaultWidth": 60,
+            "defaultHeight": 80,
+            "description": "Queen Bed",
+            "category": "Bed",
+            "type": "furniture",
+            "uid": "lhit3qkb6g267vscalc",
+            "z": 2,
+            "width": 59.333333333333336,
+            "height": 114,
+            "rotate": 270,
+            "x": 28.517966666666666,
+            "y": 88.10199999999999
+        }
+    ]
+}

@@ -103,7 +103,7 @@ def doorAndBedCheck(_door, _bed, room, jsonData):
 
   if((not same_direction(degreeBetween, _door['rotate'], 65) and not same_direction(degreeBetween, _door['rotate']+180, 65))):
     jsonData['complaints'].append('Move your bed so it is in view of your doorway')
-    jsonData['rating'] - 30
+    jsonData['rating'] -= 40
     jsonData['DEBUG']['DOOR_IN_VIEW_OF_BED'] = False
     return jsonData
   else:
@@ -111,7 +111,7 @@ def doorAndBedCheck(_door, _bed, room, jsonData):
 
   if((same_direction(degreeBetween, _bed['rotate'], 10) or same_direction(degreeBetween, _bed['rotate']+180, 10))):
     jsonData['complaints'].append('Your bed may be directly facing the door')
-    jsonData['rating'] - 20
+    jsonData['rating'] -= 40
     jsonData['DEBUG']['BED_DIRECTLY_DOOR'] = True
   else:
     jsonData['DEBUG']['BED_DIRECTLY_DOOR'] = False
@@ -148,14 +148,14 @@ def symetrySideTable(_sideTables, _bed, jsonData):
     if(not (minX < _table1['x'] < maxX) or not (minY < _table1['y'] < maxY)):
       jsonData['complaints'].append('Your side tables are too far apart')
       jsonData['DEBUG']['SIDE_NEAR_EACH_OTHER'] = False
-      jsonData['rating'] -= 10
+      jsonData['rating'] -= 30
     else:
       jsonData['DEBUG']['SIDE_NEAR_EACH_OTHER'] = True
 
     if not (same_direction(_table1['rotate'], _table2['rotate'], 15)):
       jsonData['complaints'].append('Tables are not facing the same direction')
       jsonData['DEBUG']['SIDE_SYMETRICAL'] = False
-      jsonData['rating'] -= 10
+      jsonData['rating'] -= 30
     else:
       jsonData['DEBUG']['SIDE_SYMETRICAL'] = True
         
