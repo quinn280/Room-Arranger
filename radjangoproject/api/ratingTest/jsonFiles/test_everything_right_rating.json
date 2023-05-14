@@ -1,0 +1,72 @@
+{
+    "roomDimensions": {
+        "width": 279,
+        "height": 176
+    },
+    "activeObjects": [
+        {
+            "itemKey": 20,
+            "url": "rightdoor.png",
+            "defaultWidth": 32,
+            "defaultHeight": 32,
+            "description": "Right Door",
+            "category": "Door",
+            "type": "structural",
+            "uid": "lhis9gp49bwcy3byb8",
+            "z": 1,
+            "width": 32,
+            "height": 32,
+            "rotate": 90,
+            "x": 224.20633333333333,
+            "y": 141.84
+        },
+        {
+            "itemKey": 1,
+            "url": "doublepillowbed.png",
+            "defaultWidth": 60,
+            "defaultHeight": 80,
+            "description": "Queen Bed",
+            "category": "Bed",
+            "type": "furniture",
+            "uid": "lhit3qkb6g267vscalc",
+            "z": 2,
+            "width": 60,
+            "height": 80,
+            "rotate": 270,
+            "x": 10.757066666666667,
+            "y": 15.112900000000002
+        },
+        {
+            "itemKey": 3,
+            "url": "nightstand.png",
+            "defaultWidth": 20,
+            "defaultHeight": 15,
+            "description": "Nightstand",
+            "category": "Nightstand",
+            "type": "furniture",
+            "uid": "lhn2pwjpm4hgaaw4sa",
+            "z": 3,
+            "width": 20,
+            "height": 15,
+            "rotate": 270,
+            "x": -0.5358066666666667,
+            "y": 89.342
+        },
+        {
+            "itemKey": 3,
+            "url": "nightstand.png",
+            "defaultWidth": 20,
+            "defaultHeight": 15,
+            "description": "Nightstand",
+            "category": "Nightstand",
+            "type": "furniture",
+            "uid": "lhn2pz9ilm1hha33rsg",
+            "z": 4,
+            "width": 20,
+            "height": 15,
+            "rotate": 270,
+            "x": -1.38434,
+            "y": 3.8583
+        }
+    ]
+}
