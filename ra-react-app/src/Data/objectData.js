@@ -793,7 +793,7 @@ const objectData = [
       },
       {
         itemKey: 89,
-        url: "vectors/structural/leftdoorrotated.svg",
+        url: "leftdoorrotated.svg",
         defaultWidth: 40,
         defaultHeight: 40,
         description: "Left Door",
@@ -802,7 +802,7 @@ const objectData = [
       },
       {
         itemKey: 90,
-        url: "vectors/structural/rightdoorrotated.svg",
+        url: "rightdoorrotated.svg",
         defaultWidth: 40,
         defaultHeight: 40,
         description: "Right Door",
@@ -811,7 +811,7 @@ const objectData = [
       },
       {
         itemKey: 91,
-        url: "vectors/structural/leftopeningdoor.PNG",
+        url: "leftopeningdoor.PNG",
         defaultWidth: 20,
         defaultHeight: 40,
         description: "Left Door",
@@ -820,7 +820,7 @@ const objectData = [
       },
       {
         itemKey: 92,
-        url: "vectors/structural/rightopeningdoor.PNG",
+        url: "rightopeningdoor.PNG",
         defaultWidth: 20,
         defaultHeight: 40,
         description: "Right Door",
@@ -829,7 +829,7 @@ const objectData = [
       },
       {
         itemKey: 93,
-        url: "vectors/structural/doubledoors.PNG",
+        url: "doubledoors.PNG",
         defaultWidth: 20,
         defaultHeight: 60,
         description: "Double Doors",
@@ -838,7 +838,7 @@ const objectData = [
       },
       {
         itemKey: 94,
-        url: "vectors/structural/window.PNG",
+        url: "window.png",
         defaultWidth: 4,
         defaultHeight: 40,
         description: "Window",
@@ -847,7 +847,7 @@ const objectData = [
       },
       {
         itemKey: 95,
-        url: "vectors/structural/clearpartition.PNG",
+        url: "clearpartition.PNG",
         defaultWidth: 60,
         defaultHeight: 6,
         description: "Clear Partition",
@@ -856,7 +856,7 @@ const objectData = [
       },
       {
         itemKey: 95,
-        url: "vectors/structural/solidpartition.PNG",
+        url: "solidpartition.PNG",
         defaultWidth: 60,
         defaultHeight: 6,
         description: "Solid Partition",
@@ -865,7 +865,7 @@ const objectData = [
       },
       {
         itemKey: 96,
-        url: "vectors/structural/staircase.PNG",
+        url: "staircase.PNG",
         defaultWidth: 48,
         defaultHeight: 120,
         description: "Straight Staircase",
@@ -874,7 +874,7 @@ const objectData = [
       },
       {
         itemKey: 97,
-        url: "vectors/structural/widestaircase.PNG",
+        url: "widestaircase.PNG",
         defaultWidth: 60,
         defaultHeight: 80,
         description: "Wide Staircase",
@@ -883,7 +883,7 @@ const objectData = [
       },
       {
         itemKey: 98,
-        url: "vectors/structural/spiralstaircase.PNG",
+        url: "spiralstaircase.PNG",
         defaultWidth: 48,
         defaultHeight: 48,
         description: "Spiral Staircase",
@@ -892,7 +892,7 @@ const objectData = [
       },
       {
         itemKey: 99,
-        url: "vectors/structural/lstaircase.PNG",
+        url: "lstaircase.PNG",
         defaultWidth: 50,
         defaultHeight: 120,
         description: "L Staircase",
@@ -901,7 +901,7 @@ const objectData = [
       },
       {
         itemKey: 100,
-        url: "vectors/structural/fannedstaircase.PNG",
+        url: "fannedstaircase.PNG",
         defaultWidth: 120,
         defaultHeight: 48,
         description: "Straight Staircase",
@@ -910,7 +910,7 @@ const objectData = [
       },
       {
         itemKey: 101,
-        url: "vectors/structural/pillar.PNG",
+        url: "pillar.png",
         defaultWidth: 24,
         defaultHeight: 24,
         description: "Pillar",
