@@ -1,6 +1,7 @@
 
 import webbrowser
 
+
 class furn:
   def __init__(self, name, category, price, description, width, height, length, link, image):
     self.name = name
@@ -83,7 +84,9 @@ def rec(furniture_data):
             "length":final.length, 
             "link":final.link, 
             "image":final.image }
+    
     webbrowser.open(final.link, new = 2)
 
     return r
+
     

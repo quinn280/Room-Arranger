@@ -17,6 +17,6 @@ def testPost(request):
 @api_view(['POST'])
 def recommendFurniture(request):
     print(request.data)
-    stuff = returnSomeStuff(request.data)
+    stuff = rec(request.data)
     responseJSON = json.dumps(stuff)
     return Response(responseJSON)
