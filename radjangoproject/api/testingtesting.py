@@ -52,3 +52,4 @@ dat = {
         furn("KALLAX", "TV Stand", 94.99, "Shelving unit with underframe, white/white,", 57.675, 23.25, 15.375, "https://www.ikea.com/us/en/p/kallax-shelving-unit-with-underframe-white-white-s59442666/", "https://www.ikea.com/us/en/images/products/kallax-shelving-unit-with-underframe-white-white__1041442_pe841030_s5.jpg?f=xxs"),
         furn("BESTA", "TV Stand", 140, "TV unit, black-brown,", 47.25, 18.825, 15.75, "https://www.ikea.com/us/en/p/besta-tv-unit-black-brown-s49061228/", "https://www.ikea.com/us/en/images/products/besta-tv-unit-black-brown__0341771_pe531784_s5.jpg?f=xxs")
       }
+      
