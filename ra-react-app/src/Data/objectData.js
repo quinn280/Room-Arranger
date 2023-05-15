@@ -792,39 +792,21 @@ const objectData = [
         type: "furniture",
       },
       {
-        itemKey: 89,
-        url: "leftdoorrotated.svg",
-        defaultWidth: 40,
-        defaultHeight: 40,
-        description: "Left Door",
-        category: "Doors",
-        type: "structural"
-      },
-      {
-        itemKey: 90,
-        url: "rightdoorrotated.svg",
-        defaultWidth: 40,
-        defaultHeight: 40,
-        description: "Right Door",
-        category: "door",
-        type: "structural"
-      },
-      {
         itemKey: 91,
         url: "leftopeningdoor.PNG",
-        defaultWidth: 20,
-        defaultHeight: 40,
+        defaultWidth: 40,
+        defaultHeight: 20,
         description: "Left Door",
-        category: "Doors",
+        category: "Door",
         type: "structural"
       },
       {
         itemKey: 92,
         url: "rightopeningdoor.PNG",
-        defaultWidth: 20,
-        defaultHeight: 40,
+        defaultWidth: 40,
+        defaultHeight: 20,
         description: "Right Door",
-        category: "Doors",
+        category: "Door",
         type: "structural"
       },
       {
@@ -855,7 +837,7 @@ const objectData = [
         type: "structural",
       },
       {
-        itemKey: 95,
+        itemKey: 500,
         url: "solidpartition.PNG",
         defaultWidth: 60,
         defaultHeight: 6,

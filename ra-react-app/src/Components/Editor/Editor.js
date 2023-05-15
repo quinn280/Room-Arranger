@@ -456,12 +456,13 @@ const Editor = () => {
     jsonObj.roomDimensions = { width: fileData.width, height: fileData.height };
     jsonObj.activeObjects = activeObjects;
 
-    console.log(jsonObj);
+    const jsonStr = JSON.stringify(jsonObj, undefined, 4);
+    console.log(jsonStr);
 
     axios.post(fengShuiAPIURL, jsonObj)
       .then(response => {
         console.log(response.data);
-        const responseData = JSON.parse(response.data);
+        const responseData = response.data;
         showFengShuiResults(responseData)
       })
       .catch(error => {
