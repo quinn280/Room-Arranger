@@ -1,3 +1,5 @@
+// deprecated
+
 import React, { useState, useRef } from "react";
 import Moveable from "react-moveable";
 import Selecto from "react-selecto";

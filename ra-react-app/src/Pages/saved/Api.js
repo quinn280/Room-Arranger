@@ -1,46 +1,22 @@
 import axios from 'axios';
 
-export const fetchData = (fileID) => {
-    const tnPromise = fetchThumbnail(fileID);
+export const getFiles = async () => {
+    return axios.get("http://localhost:8000/api/files/");
+};
 
-    return {
-        tn: wrapPromise(tnPromise),
-    }
+export const deleteFile = async (fileID) => {
+    axios.delete(`http://localhost:8000/api/files/${fileID}/`);
 }
 
-const wrapPromise = (promise) => {
-    // set initial status
-    let status = 'pending'
-    let result;
-    let suspender = promise.then(
-        res => {
-            status = 'success';
-            result = res;
-        },
-        err => {
-            status = 'error';
-            result = err;
-        }
-    );
-
-    return {
-        read() {
-            if (status === 'pending') {
-                throw suspender;
-            }
-            else if (status === 'error') {
-                throw result;
-            }
-            else if (status === 'sucess' ) {
-                return result;
-            }
-        }
-    }
+export const deleteObjAtFile = async (fileID) =>
+{
+    axios.delete(`http://localhost:8000/api/ro/file/${fileID}/`);
 }
 
-const fetchThumbnail = (fileID) => {
-    console.log('fetching thumbnail')
-    return axios.get(`http://localhost:8000/api/thumbnail/${fileID}`)
-    .then(res => res.data)
-    .catch(err => console.log(err))
+export const updateFile = async (fileID, fileObj) => {
+    axios.put(`http://localhost:8000/api/files/${fileID}/`, fileObj);
+};
+
+export const addFile = async(fileObj) => {
+    axios.post(`http://localhost:8000/api/files/`, fileObj);
 }

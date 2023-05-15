@@ -7,10 +7,11 @@ import { flushSync } from "react-dom";
 import axios from 'axios';
 import './Editor.css';
 import objectList from "Data/objectData.js";
+import * as Utils from 'Utils/utils.js';
+import * as Api from './Api.js';
 
 const furnitureList = objectList.filter(o => o.type === "furniture");
 const structureList = objectList.filter(o => o.type === "structural");
-
 const objectsPath = `${process.env.PUBLIC_URL}/objects/`
 const fengShuiAPIURL = "http://127.0.0.1:8000/testpost/";
 const furnRecAPIURL = "http://127.0.0.1:8000/furnRec/";
@@ -18,52 +19,6 @@ const inchPixelRatio = 3;
 const wallWidth = 1;
 const Modes = Object.freeze({ room: "room", furnish: "furnish" }) // modes enum
 const MAX_Z = 2147483647;
-
-const inchToPx = (inches) => {
-  inches = parseFloat(inches);
-  var pixels = inches * inchPixelRatio;
-  return pixels;
-}
-
-const pxToInch = (pixels) => {
-  pixels = parseFloat(pixels);
-  var inches = parseFloat(pixels / inchPixelRatio);
-  return inches;
-}
-
-const generateUID = () => {
-  return Date.now().toString(36) + Math.random().toString(36).substr(2);
-}
-
-const normalizeRotation = (rotation) => {
-  var nRotation = parseFloat(rotation) % 360;
-  if (nRotation < 0)
-    nRotation += 360;
-
-  return nRotation;
-}
-
-function round(value, precision) {
-  var multiplier = Math.pow(10, precision || 0);
-  return Math.round(value * multiplier) / multiplier;
-}
-
-const parseTransform = (transformText) => {
-  const rotateRE = new RegExp('rotate\\((.*)\\)');
-  const xRE = new RegExp('translate\\((.*),');
-  const yRE = new RegExp('translate\\(.*, (.*?)\\)');
-
-  const rotate = (transformText.match(rotateRE)) ? transformText.match(rotateRE)[1] : "0deg";
-  const x = (transformText.match(xRE)) ? transformText.match(xRE)[1] : "0px";
-  const y = (transformText.match(yRE)) ? transformText.match(yRE)[1] : "0px";
-
-  return { rotate: rotate, x: x, y: y };
-}
-
-
-
-// 2 high level objects. 1 is design file, 1 is array of queried room objects
-// file-detail to get file at start, 
 
 const Editor = () => {
   let { file } = useParams();
@@ -90,14 +45,14 @@ const Editor = () => {
   const roomHeightInputRef = useRef(null);
 
   React.useEffect(() => {
-    const filePromise = getFileDB(file);
-    const objectsPromise = getObjectsDB(file);
+    const filePromise = Api.getFileDB(file);
+    const objectsPromise = Api.getObjectsDB(file);
 
     Promise.all([filePromise, objectsPromise]).then(([fileResponse, objectsResponse]) => {
       setFileData(fileResponse.data);
-      setActiveObjects(objectsResponse.data);  
-      window.addEventListener('resize', zoomFit);      
-      
+      setActiveObjects(objectsResponse.data);
+      window.addEventListener('resize', zoomFit);
+
 
       setTimeout(() => {
         initScrollOptions();
@@ -106,34 +61,11 @@ const Editor = () => {
       }, 0);
 
       setLoading(false);
-      
+
     })
 
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const getFileDB = async (fileID) => {
-    return axios.get(`http://localhost:8000/api/files/${fileID}/`);
-  };
-
-  const updateFileDB = async (fileID, fileObj) => {
-    return axios.put(`http://localhost:8000/api/files/${fileID}/`, fileObj);
-  };
-
-  const getObjectsDB = async (fileID) => {
-    return axios.get(`http://localhost:8000/api/ro/file/${fileID}/`);
-  }
-
-  const addObjectDB = async (obj) => {
-    return axios.post(`http://localhost:8000/api/ro/`, obj);
-  }
-
-  const updateObjectDB = async (obj, uid) => {
-    return axios.put(`http://localhost:8000/api/ro/${uid}/`, obj);
-  }
-
-  const removeObjectsArrayDB = async (uidArray) => {
-    return axios.post(`http://localhost:8000/api/ro/DeleteAllByID/`, uidArray);
-  }
 
   const getMaxZ = () => {
     return Math.max(...activeObjects.map(obj => obj.z));
@@ -154,19 +86,18 @@ const Editor = () => {
   const updateFileModifiedDate = () => {
     const newFileData = { ...fileData };
     newFileData["modifiedDate"] = new Date(Date.now());
-    updateFileDB(file, newFileData);
+    Api.updateFileDB(file, newFileData);
   }
 
   const updateFileSetting = (setting, newValue, updateState = true) => {
     const newFileData = { ...fileData };
     newFileData[setting] = newValue;
     newFileData["modifiedDate"] = new Date(Date.now());
-    updateFileDB(file, newFileData);
+    Api.updateFileDB(file, newFileData);
 
     if (updateState)
       setFileData(newFileData);
   }
-
 
   const updateFileSettings = (settings, newValues, updateState = true) => {
     if (settings.length !== newValues.length)
@@ -178,7 +109,7 @@ const Editor = () => {
     }
     newFileData["modifiedDate"] = new Date(Date.now());
 
-    updateFileDB(file, newFileData);
+    Api.updateFileDB(file, newFileData);
     if (updateState)
       setFileData(newFileData);
   }
@@ -186,41 +117,38 @@ const Editor = () => {
   const updateObjectValue = (uid, property, newValue, updateState = true) => {
     let _activeObjects = [...activeObjects];
     let foundIndex = _activeObjects.findIndex(o => o.uid === uid);
-    let foundObject = {..._activeObjects[foundIndex]};
+    let foundObject = { ..._activeObjects[foundIndex] };
 
     foundObject[property] = newValue;
 
-    updateObjectDB(foundObject, uid);
+    Api.updateObjectDB(foundObject, uid);
     updateFileModifiedDate();
-    if (updateState)
-    {
+    if (updateState) {
       _activeObjects[foundIndex] = foundObject;
       setActiveObjects(_activeObjects);
-    }   
+    }
   }
 
   const updateObjectValues = (uid, properties, newValues, updateState = true) => {
     if (properties.length !== newValues.length)
       return;
-      
+
     let _activeObjects = [...activeObjects];
     let foundIndex = _activeObjects.findIndex(o => o.uid === uid);
-    let foundObject = {..._activeObjects[foundIndex]};
+    let foundObject = { ..._activeObjects[foundIndex] };
 
-    for (let i = 0; i < properties.length; i++)
-    {
+    for (let i = 0; i < properties.length; i++) {
       foundObject[properties[i]] = newValues[i];
     }
 
     console.log(foundObject);
-    
-    updateObjectDB(foundObject, uid);
+
+    Api.updateObjectDB(foundObject, uid);
     updateFileModifiedDate();
-    if (updateState)
-    {
+    if (updateState) {
       _activeObjects[foundIndex] = foundObject;
       setActiveObjects(_activeObjects);
-    }   
+    }
   }
 
   const initScrollOptions = () => {
@@ -240,35 +168,31 @@ const Editor = () => {
   const [requestCallbacksFurniture] = useState(() => {
     function request(caller) {
 
-      if (caller === "x" || caller === "y")
-      {
+      if (caller === "x" || caller === "y") {
         moveableRef.current.request("draggable", {
-          x: inchToPx(xInputRef.current.value),
-          y: inchToPx(yInputRef.current.value),
+          x: Utils.inchToPx(xInputRef.current.value),
+          y: Utils.inchToPx(yInputRef.current.value),
         }, true);
       }
-      else if (caller === "height" || caller === "width")
-      {
+      else if (caller === "height" || caller === "width") {
         moveableRef.current.request("resizable", {
-          offsetWidth: inchToPx(widthInputRef.current.value),
-          offsetHeight: inchToPx(heightInputRef.current.value),
+          offsetWidth: Utils.inchToPx(widthInputRef.current.value),
+          offsetHeight: Utils.inchToPx(heightInputRef.current.value),
         }, true);
       }
-      else if (caller === "rotation")
-      {
+      else if (caller === "rotation") {
         moveableRef.current.request("rotatable", {
           rotate: parseInt(rotateInputRef.current.value),
         }, true);
       }
-      else
-      {
+      else {
         console.log("requestCallBacksObjects: Unexpected Caller")
       }
-      
 
-      
 
-      
+
+
+
     }
 
     return {
@@ -296,8 +220,8 @@ const Editor = () => {
 
     function request() {
       boxRef.current.request("resizable", {
-        offsetWidth: inchToPx(roomWidthInputRef.current.value) + inchToPx(2 * wallWidth),
-        offsetHeight: inchToPx(roomHeightInputRef.current.value) + inchToPx(2 * wallWidth),
+        offsetWidth: Utils.inchToPx(roomWidthInputRef.current.value) + Utils.inchToPx(2 * wallWidth),
+        offsetHeight: Utils.inchToPx(roomHeightInputRef.current.value) + Utils.inchToPx(2 * wallWidth),
       }, true);
     }
 
@@ -320,10 +244,9 @@ const Editor = () => {
     };
   });
 
-
   const handleRemove = (uidArray) => {
     setActiveObjects(activeObjects.filter(f => !uidArray.includes(f.uid)));
-    removeObjectsArrayDB(uidArray);
+    Api.removeObjectsArrayDB(uidArray);
 
     setTargets([]);
     clearObjectForm();
@@ -367,31 +290,31 @@ const Editor = () => {
 
     const newActvObj = Object.assign({}, foundItem);
     newActvObj.fileID = file;
-    newActvObj.uid = generateUID();
+    newActvObj.uid = Utils.generateUID();
     newActvObj.z = getNewZ();
     newActvObj.width = newActvObj.defaultWidth;
     newActvObj.height = newActvObj.defaultHeight;
     newActvObj.rotate = 0;
 
-    const roomWidth = pxToInch(document.getElementById("room").style.width);
-    const roomHeight = pxToInch(document.getElementById("room").style.height);
+    const roomWidth = Utils.pxToInch(document.getElementById("room").style.width);
+    const roomHeight = Utils.pxToInch(document.getElementById("room").style.height);
     newActvObj.x = roomWidth / 2 - newActvObj.width / 2;
     newActvObj.y = roomHeight / 2 - newActvObj.height / 2;
 
     const _activeObjects = [...activeObjects, newActvObj];
     setActiveObjects(() => _activeObjects);
-    addObjectDB(newActvObj);
+    Api.addObjectDB(newActvObj);
 
     // schedule async callback to highlight and update forms
     setTimeout(() => {
       const elem = document.getElementById(newActvObj.uid);
       setTargets([elem]);
 
-      xInputRef.current.value = `${round(newActvObj.x, 1)}`;
-      yInputRef.current.value = `${round(newActvObj.y, 1)}`;
-      widthInputRef.current.value = `${round(newActvObj.width, 1)}`;
-      heightInputRef.current.value = `${round(newActvObj.height, 1)}`;
-      rotateInputRef.current.value = `${round(newActvObj.rotate, 1)}`;
+      xInputRef.current.value = `${Utils.round(newActvObj.x, 1)}`;
+      yInputRef.current.value = `${Utils.round(newActvObj.y, 1)}`;
+      widthInputRef.current.value = `${Utils.round(newActvObj.width, 1)}`;
+      heightInputRef.current.value = `${Utils.round(newActvObj.height, 1)}`;
+      rotateInputRef.current.value = `${Utils.round(newActvObj.rotate, 1)}`;
     }, 0);
   }
 
@@ -427,47 +350,55 @@ const Editor = () => {
   const updateFurnitureForm = (e) => {
     requestAnimationFrame(() => {
       const rect = e.moveable.getRect();
-      xInputRef.current.value = `${round(pxToInch(rect.left), 1)}`;
-      yInputRef.current.value = `${round(pxToInch(rect.top), 1)}`;
-      widthInputRef.current.value = `${round(pxToInch(rect.offsetWidth), 1)}`;
-      heightInputRef.current.value = `${round(pxToInch(rect.offsetHeight), 1)}`;
-      rotateInputRef.current.value = `${round(rect.rotation, 0)}`;
+      xInputRef.current.value = `${Utils.round(Utils.pxToInch(rect.left), 1)}`;
+      yInputRef.current.value = `${Utils.round(Utils.pxToInch(rect.top), 1)}`;
+      widthInputRef.current.value = `${Utils.round(Utils.pxToInch(rect.offsetWidth), 1)}`;
+      heightInputRef.current.value = `${Utils.round(Utils.pxToInch(rect.offsetHeight), 1)}`;
+      rotateInputRef.current.value = `${Utils.round(rect.rotation, 0)}`;
     })
   };
 
   const updateRoomFormResizeEnd = (e) => {
     requestAnimationFrame(() => {
       const rect = e.moveable.getRect();
-      roomWidthInputRef.current.value = `${round(pxToInch(rect.offsetWidth) - wallWidth * 2, 0)}`;
-      roomHeightInputRef.current.value = `${round(pxToInch(rect.offsetHeight) - wallWidth * 2, 0)}`;
+      roomWidthInputRef.current.value = `${Utils.round(Utils.pxToInch(rect.offsetWidth) - wallWidth * 2, 0)}`;
+      roomHeightInputRef.current.value = `${Utils.round(Utils.pxToInch(rect.offsetHeight) - wallWidth * 2, 0)}`;
     })
   };
 
   const updateRoomForm = () => {
     setTimeout(() => {
       const roomElem = document.getElementsByClassName("room")[0];
-      roomWidthInputRef.current.value = `${round(pxToInch(roomElem.style.width), 0)}`;
-      roomHeightInputRef.current.value = `${round(pxToInch(roomElem.style.height), 0)}`;
+      roomWidthInputRef.current.value = `${Utils.round(Utils.pxToInch(roomElem.style.width), 0)}`;
+      roomHeightInputRef.current.value = `${Utils.round(Utils.pxToInch(roomElem.style.height), 0)}`;
     }, 10);
   };
 
   const exportData = () => {
-    const jsonObj = {};
-    jsonObj.roomDimensions = { width: fileData.width, height: fileData.height };
-    jsonObj.activeObjects = activeObjects;
 
-    const jsonStr = JSON.stringify(jsonObj, undefined, 4);
-    console.log(jsonStr);
+    const filePromise = Api.getFileDB(file);
+    const objectsPromise = Api.getObjectsDB(file);
 
-    axios.post(fengShuiAPIURL, jsonObj)
-      .then(response => {
-        console.log(response.data);
-        const responseData = response.data;
-        showFengShuiResults(responseData)
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    Promise.all([filePromise, objectsPromise]).then(([fileResponse, objectsResponse]) => {
+      const jsonObj = {};
+      jsonObj.roomDimensions = { width: fileResponse.data.width, height: fileResponse.data.height };
+      jsonObj.activeObjects = objectsResponse.data;
+
+      const jsonStr = JSON.stringify(jsonObj, undefined, 4);
+
+      console.log("posted: ")
+      console.log(jsonStr);
+
+      axios.post(fengShuiAPIURL, jsonObj)
+        .then(response => {
+          console.log(response.data);
+          const responseData = response.data;
+          showFengShuiResults(responseData)
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    })
   }
 
   const showFengShuiResults = (results) => {
@@ -514,7 +445,7 @@ const Editor = () => {
         willChange: "transform",
         transform: `translate(-50%, 0px)`,
       }}>
-        {Math.round(pxToInch(rect.offsetWidth))}" x {Math.round(pxToInch(rect.offsetHeight))}"
+        {Math.round(Utils.pxToInch(rect.offsetWidth))}" x {Math.round(Utils.pxToInch(rect.offsetHeight))}"
       </div>;
     },
   };
@@ -540,7 +471,7 @@ const Editor = () => {
         willChange: "transform",
         transform: `translate(-50%, 0px)`,
       }}>
-        {Math.round(pxToInch(rect.offsetWidth) - 2 * wallWidth)}" x {Math.round(pxToInch(rect.offsetHeight) - 2 * wallWidth)}"
+        {Math.round(Utils.pxToInch(rect.offsetWidth) - 2 * wallWidth)}" x {Math.round(Utils.pxToInch(rect.offsetHeight) - 2 * wallWidth)}"
       </div>;
     },
   };
@@ -574,7 +505,7 @@ const Editor = () => {
     var padX = 0.2 * ivWidth;
     var padY = 0.2 * ivHeight;
 
-    var newZoom = getZoomFitValue(
+    var newZoom = Utils.getZoomFitValue(
       ivWidth,
       ivHeight,
       rWidth,
@@ -592,20 +523,7 @@ const Editor = () => {
     // schedule async callback
     setTimeout(() => {
       viewerRef.current.scrollTo(xScroll, yScroll);
-    }, 0);
-  };
-
-  const getZoomFitValue = (
-    ivWidth,
-    ivHeight,
-    rWidth,
-    rHeight,
-    padX = 0,
-    padY = 0
-  ) => {
-    var maxZoomX = (ivWidth - padX) / rWidth;
-    var maxZoomY = (ivHeight - padY) / rHeight;
-    return Math.min(maxZoomX, maxZoomY);
+    }, 100);
   };
 
   const moveRoom = (x, y) => {
@@ -614,16 +532,16 @@ const Editor = () => {
 
     setTimeout(() => {
       boxRef.current.updateRect();
-    }, 0);  
+    }, 0);
   };
 
   const updateObjectStorage = (e) => {
     var uid = e.target.id;
-    var newX = pxToInch(parseTransform(e.target.style.transform).x);
-    var newY = pxToInch(parseTransform(e.target.style.transform).y);
-    var newHeight = pxToInch(e.target.style.height);
-    var newWidth = pxToInch(e.target.style.width);
-    var newRotate = normalizeRotation(parseFloat(parseTransform(e.target.style.transform).rotate));
+    var newX = Utils.pxToInch(Utils.parseTransform(e.target.style.transform).x);
+    var newY = Utils.pxToInch(Utils.parseTransform(e.target.style.transform).y);
+    var newHeight = Utils.pxToInch(e.target.style.height);
+    var newWidth = Utils.pxToInch(e.target.style.width);
+    var newRotate = Utils.normalizeRotation(parseFloat(Utils.parseTransform(e.target.style.transform).rotate));
 
     const modifiedProperties = ["x", "y", "height", "width", "rotate"];
     const newValues = [newX, newY, newHeight, newWidth, newRotate];
@@ -679,10 +597,10 @@ const Editor = () => {
           <div>
             <div className="room" ref={boxRef} id="room"
               style={{
-                width: `${inchToPx(fileData.width)}px`,
-                height: `${inchToPx(fileData.height)}px`,
+                width: `${Utils.inchToPx(fileData.width)}px`,
+                height: `${Utils.inchToPx(fileData.height)}px`,
                 position: "absolute",
-                borderWidth: `${inchToPx(wallWidth)}px`
+                borderWidth: `${Utils.inchToPx(wallWidth)}px`
               }}>
               {activeObjects.map((f) => (
                 <img
@@ -699,9 +617,9 @@ const Editor = () => {
                     draggable: false,
                     position: "absolute",
                     zIndex: `${f.z}`,
-                    width: `${inchToPx(f.width)}px`,
-                    height: `${inchToPx(f.height)}px`,
-                    transform: `translate(${inchToPx(f.x)}px, ${inchToPx(f.y)}px) rotate(${f.rotate}deg)`
+                    width: `${Utils.inchToPx(f.width)}px`,
+                    height: `${Utils.inchToPx(f.height)}px`,
+                    transform: `translate(${Utils.inchToPx(f.x)}px, ${Utils.inchToPx(f.y)}px) rotate(${f.rotate}deg)`
                   }}
                 />
               ))}
@@ -831,8 +749,8 @@ const Editor = () => {
               onResizeEnd={e => {
                 updateRoomFormResizeEnd(e);
 
-                var newHeight = round(pxToInch(e.target.style.height), 0);
-                var newWidth = round(pxToInch(e.target.style.width), 0);
+                var newHeight = Utils.round(Utils.pxToInch(e.target.style.height), 0);
+                var newWidth = Utils.round(Utils.pxToInch(e.target.style.width), 0);
 
                 console.log("resize end");
                 updateFileSettings(["width", "height"], [newWidth, newHeight], false);
@@ -929,7 +847,5 @@ const Editor = () => {
     </div>
   );
 };
-
-
 
 export default Editor;

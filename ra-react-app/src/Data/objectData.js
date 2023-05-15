@@ -68,7 +68,7 @@ const objectData = [
         defaultWidth: 30,
         defaultHeight: 20,
         description: "Nightstand",
-        category: "Nightstands",
+        category: "Nightstand",
         type: "furniture",
       },
       {
@@ -77,7 +77,7 @@ const objectData = [
         defaultWidth: 20,
         defaultHeight: 30,
         description: "Nightstand",
-        category: "Nightstands",
+        category: "Nightstand",
         type: "furniture",
       },
       {
@@ -86,7 +86,7 @@ const objectData = [
         defaultWidth: 25,
         defaultHeight: 25,
         description: "Nightstand",
-        category: "Nightstands",
+        category: "Nightstand",
         type: "furniture",
       },
       {
@@ -95,7 +95,7 @@ const objectData = [
         defaultWidth: 30,
         defaultHeight: 20,
         description: "Nightstand",
-        category: "Nightstands",
+        category: "Nightstand",
         type: "furniture",
       },
       {
@@ -104,7 +104,7 @@ const objectData = [
         defaultWidth: 30,
         defaultHeight: 20,
         description: "Nightstand",
-        category: "Nightstands",
+        category: "Nightstand",
         type: "furniture",
       },
       {

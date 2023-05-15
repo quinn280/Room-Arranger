@@ -3,98 +3,38 @@ import { useNavigate } from "react-router-dom";
 import './saved.css';
 import axios from 'axios';
 import Thumbnail from "./thumbnail";
+import * as Utils from 'Utils/utils.js';
+import * as Api from './Api.js';
 
 const SortTypes = Object.freeze({ alphabetical: "Alphabetical", dateCreated: "Date Created", dateModified: "Date Modified" }) // modes enum
 const generateUID = () => {
     return Date.now().toString(36) + Math.random().toString(36).substr(2);
 }
 
-function compareByDateCreated(a, b) {
-    const aDate = new Date(a.createDate);
-    const bDate = new Date(b.createDate);
-
-    if (aDate > bDate)
-        return -1;
-    if (aDate < bDate)
-        return 1;
-    return 0;
-}
-
-function compareByDateModified(a, b) {
-    const aDate = new Date(a.modifiedDate);
-    const bDate = new Date(b.modifiedDate);
-
-    if (aDate > bDate)
-        return -1;
-    if (aDate < bDate)
-        return 1;
-    return 0;
-}
-
-function compareByFileName(a, b) {
-    if (a.name < b.name)
-        return -1;
-    if (a.name > b.name)
-        return 1;
-    return 0;
-}
-
-function formatDate(dateString) {
-    const today = new Date(Date.now());
-    const date = new Date(dateString);
-
-    // return time if today
-    if (date.toDateString() === today.toDateString()) {
-        return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
-    }
-    else {
-        return date.toLocaleDateString("en-US");
-    }
-}
 
 const Saved = () => {
     const [fileList, setFileList] = useState([]);
     const [sortType, setSortType] = useState((localStorage.sortType) ? JSON.parse(localStorage.sortType) : SortTypes.dateModified);
     const navigate = useNavigate();
 
-
-
     React.useEffect(() => {
-        const fileListPromise = getFiles();
+        const fileListPromise = Api.getFiles();
 
         Promise.all([fileListPromise]).then(([fileListResponse]) => {
             setFileList(initialSort(fileListResponse.data));
         })
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const getFiles = async () => {
-        return axios.get("http://localhost:8000/api/files/");
-    };
-
-    // const getThumbnail = async () => {
-    //     return axios.get("http://localhost:8000/api/thumbnail/");
-    // };
-
-    // const getThumbnail2 = async (fileID) => {
-    //     let what = axios.get(`http://localhost:8000/api/thumbnail/${fileID}`).data;
-    //     console.log(what)
-    //     return what;
-    // };
-
     const removeFile = async (fileID) => {
         setFileList(fileList.filter(f => f.fileID !== fileID));
-        axios.delete(`http://localhost:8000/api/files/${fileID}/`);
-        axios.delete(`http://localhost:8000/api/ro/file/${fileID}/`);
+        Api.deleteFile(fileID);
+        Api.deleteObjAtFile(fileID);
     };
 
     const addFileAndOpen = async (fileObj) => {
         await axios.post(`http://localhost:8000/api/files/`, fileObj).then(() => {
             openFile(fileObj.fileID);
         });
-    };
-
-    const updateFile = async (fileID, fileObj) => {
-        axios.put(`http://localhost:8000/api/files/${fileID}/`, fileObj);
     };
 
     const changeFileName = (fileID) => {
@@ -110,7 +50,7 @@ const Saved = () => {
         _fileList[foundIndex] = foundFile;
         _fileList = initialSort(_fileList);
         setFileList(_fileList);
-        updateFile(fileID, foundFile);
+        Api.updateFile(fileID, foundFile);
     }
 
     const openNewFile = () => {
@@ -137,16 +77,16 @@ const Saved = () => {
 
         switch (newSortType) {
             case SortTypes.alphabetical:
-                sortFunction = compareByFileName;
+                sortFunction = Utils.compareByFileName;
                 break;
             case SortTypes.dateModified:
-                sortFunction = compareByDateModified;
+                sortFunction = Utils.compareByDateModified;
                 break;
             case SortTypes.dateCreated:
-                sortFunction = compareByDateCreated;
+                sortFunction = Utils.compareByDateCreated;
                 break;
             default:
-                sortFunction = compareByDateModified;
+                sortFunction = Utils.compareByDateModified;
                 break;
         }
 
@@ -162,16 +102,16 @@ const Saved = () => {
 
         switch (sortType) {
             case SortTypes.alphabetical:
-                sortFunction = compareByFileName;
+                sortFunction = Utils.compareByFileName;
                 break;
             case SortTypes.dateModified:
-                sortFunction = compareByDateModified;
+                sortFunction = Utils.compareByDateModified;
                 break;
             case SortTypes.dateCreated:
-                sortFunction = compareByDateCreated;
+                sortFunction = Utils.compareByDateCreated;
                 break;
             default:
-                sortFunction = compareByDateModified;
+                sortFunction = Utils.compareByDateModified;
                 break;
         }
 
@@ -212,7 +152,7 @@ const Saved = () => {
                             <div className="file-info">
                                 <div>
                                     <h3>{f.name}</h3>
-                                    <p>last modified {formatDate(f.modifiedDate)}</p>
+                                    <p>last modified {Utils.formatDate(f.modifiedDate)}</p>
                                 </div>
                                 
                                 <div className="fileButtons">
