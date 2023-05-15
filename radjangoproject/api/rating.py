@@ -55,7 +55,7 @@ Helper functions
 """
 def getFirstDoor(_doors):
   for i in _doors:
-    if i['category'] == "Door" or i['category'] == "door":
+    if i['category'] == "Door" or i['category'] == "door" or i['category'] == "Doors":
       return i
   return 0
 
