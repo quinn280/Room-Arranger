@@ -68,7 +68,7 @@ def getBed(_furniture):
 def getSideTables(_furniture):
   vectorReturn = []
   for i in _furniture:
-    if i['category'] == 'Nightstand' or i['category'] == 'SideTable':
+    if i['category'] == 'Nightstand' or i['category'] == 'SideTable' or i['category'] == 'Nightstands':
       vectorReturn.append(i)
   return vectorReturn
 
@@ -139,11 +139,11 @@ def symetrySideTable(_sideTables, _bed, jsonData):
     # Complains if tables are not close enough to each other
 
 
-    minX = _table2['x'] - 1.5*_bed['width']
-    maxX = _table2['x'] + 1.5*_bed['width']
+    minX = _table2['x'] - 1.75*_bed['width']
+    maxX = _table2['x'] + 1.75*_bed['width']
 
-    minY = _table2['y'] - 1.5*_bed['width']
-    maxY = _table2['y'] + 1.5*_bed['width']
+    minY = _table2['y'] - 1.75*_bed['width']
+    maxY = _table2['y'] + 1.75*_bed['width']
 
     if(not (minX < _table1['x'] < maxX) or not (minY < _table1['y'] < maxY)):
       jsonData['complaints'].append('Your side tables are too far apart')
